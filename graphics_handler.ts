@@ -47,11 +47,5 @@ export function coloring() {
     })
 }
 
-const t = intitial_game()
-
-arr_to_html(t)
-
-coloring()
-
 
 
