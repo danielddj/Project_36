@@ -1,7 +1,45 @@
-export const starting_pos: any = {"a1": "Brook", "b1": "Bknight", "c1": "Bbishop", "d1": "Bqueen", "e1": "Bking", "f1": "Brook", "g1": "Bknight", "h1": "Bbishop", 
-                                    "a2": "Bpawn", "b2": "Bpawn", "c2": "Bpawn", "d2": "Bpawn", "e2": "Bpawn", "f2": "Bpawn", "g2": "Bpawn", "h2": "Bpawn", 
-                                    "a8": "Wrook", "b8": "Wknight", "c8": "Wbishop", "d8": "Wqueen", "e8": "Wking", "f8": "Wrook", "g8": "Wknight", "h8": "Wbishop", 
-                                    "a7": "Wpawn", "b7": "Wpawn", "c7": "Wpawn", "d7": "Wpawn", "e7": "Wpawn", "f7": "Wpawn", "g7": "Wpawn", "h7": "Wpawn",}
+export type chess_box ={
+    piece: string | null;
+    id: string;
+    piece_color: string | null
+}
+
+export interface board {
+    [key: string]: chess_box;
+ }
+
+export const starting_pos: board = {"a1": {piece: "Brook", id: "a1", piece_color: "black"}, 
+                                    "b1": {piece: "Bknight", id: "b1", piece_color: "black"}, 
+                                    "c1": {piece: "Bbishop", id: "c1", piece_color: "black"}, 
+                                    "d1": {piece: "Bqueen", id: "d1", piece_color: "black"}, 
+                                    "e1": {piece: "Bking", id: "e1", piece_color: "black"}, 
+                                    "f1": {piece: "Brook", id: "f1", piece_color: "black"}, 
+                                    "g1": {piece: "Bknight", id: "g1", piece_color: "black"}, 
+                                    "h1": {piece: "Bbishop", id: "h1", piece_color: "black"}, 
+                                    "a2": {piece: "Bpawn", id: "a2", piece_color: "black"}, 
+                                    "b2": {piece: "Bpawn", id: "b2", piece_color: "black"}, 
+                                    "c2": {piece: "Bpawn", id: "c2", piece_color: "black"}, 
+                                    "d2": {piece: "Bpawn", id: "d2", piece_color: "black"}, 
+                                    "e2": {piece: "Bpawn", id: "e2", piece_color: "black"}, 
+                                    "f2": {piece: "Bpawn", id: "f2", piece_color: "black"}, 
+                                    "g2": {piece: "Bpawn", id: "g2", piece_color: "black"}, 
+                                    "h2": {piece: "Bpawn", id: "h2", piece_color: "black"}, 
+                                    "a8": {piece: "Wrook", id: "a8", piece_color: "black"}, 
+                                    "b8": {piece: "Wknight", id: "b8", piece_color: "white"}, 
+                                    "c8": {piece: "Wbishop", id: "c8", piece_color: "white"}, 
+                                    "d8": {piece: "Wqueen", id: "d8", piece_color: "white"}, 
+                                    "e8": {piece: "Wking", id: "e8", piece_color: "white"}, 
+                                    "f8": {piece: "Wbishop", id: "f8", piece_color: "white"}, 
+                                    "g8": {piece: "Wknight", id: "g8", piece_color: "white"}, 
+                                    "a7": {piece: "Wpawn", id: "a7", piece_color: "white"}, 
+                                    "h8": {piece: "Wrook", id: "h8", piece_color: "white"},
+                                    "b7": {piece: "Wpawn", id: "b7", piece_color: "white"}, 
+                                    "c7": {piece: "Wpawn", id: "c7", piece_color: "white"}, 
+                                    "d7": {piece: "Wpawn", id: "d7", piece_color: "white"}, 
+                                    "e7": {piece: "Wpawn", id: "e7", piece_color: "white"}, 
+                                    "f7": {piece: "Wpawn", id: "f7", piece_color: "white"}, 
+                                    "g7": {piece: "Wpawn", id: "g7", piece_color: "white"}, 
+                                    "h7": {piece: "Wpawn", id: "h7", piece_color: "white"}}
 
 export const board_color: Array<string> = ["w", "b", "w", "b", "w", "b", "w", "b",
                                     "b", "w", "b", "w", "b", "w", "b", "w",
@@ -12,19 +50,88 @@ export const board_color: Array<string> = ["w", "b", "w", "b", "w", "b", "w", "b
                                     "w", "b", "w", "b", "w", "b", "w", "b",
                                     "b", "w", "b", "w", "b", "w", "b", "w",]
 
-export type chessbox ={
-    piece: string;
-    id: string;
-    element: Element
+
+export const c_board: board  = {
+    "a1": {piece: null, id: "a1", piece_color: null}, 
+    "b1": {piece: null, id: "b1", piece_color: null}, 
+    "c1": {piece: null, id: "c1", piece_color: null}, 
+    "d1": {piece: null, id: "d1", piece_color: null}, 
+    "e1": {piece: null, id: "e1", piece_color: null}, 
+    "f1": {piece: null, id: "f1", piece_color: null}, 
+    "g1": {piece: null, id: "g1", piece_color: null}, 
+    "h1": {piece: null, id: "h1", piece_color: null}, 
+    "a2": {piece: null, id: "a2", piece_color: null}, 
+    "b2": {piece: null, id: "b2", piece_color: null}, 
+    "c2": {piece: null, id: "c2", piece_color: null}, 
+    "d2": {piece: null, id: "d2", piece_color: null}, 
+    "e2": {piece: null, id: "e2", piece_color: null}, 
+    "f2": {piece: null, id: "f2", piece_color: null}, 
+    "g2": {piece: null, id: "g2", piece_color: null}, 
+    "h2": {piece: null, id: "h2", piece_color: null}, 
+    "a3": {piece: null, id: "a3", piece_color: null}, 
+    "b3": {piece: null, id: "b3", piece_color: null}, 
+    "c3": {piece: null, id: "c3", piece_color: null}, 
+    "d3": {piece: null, id: "d3", piece_color: null}, 
+    "e3": {piece: null, id: "e3", piece_color: null}, 
+    "f3": {piece: null, id: "f3", piece_color: null}, 
+    "g3": {piece: null, id: "g3", piece_color: null}, 
+    "h3": {piece: null, id: "h3", piece_color: null}, 
+    "a4": {piece: null, id: "a4", piece_color: null}, 
+    "b4": {piece: null, id: "b4", piece_color: null}, 
+    "c4": {piece: null, id: "c4", piece_color: null}, 
+    "d4": {piece: null, id: "d4", piece_color: null}, 
+    "e4": {piece: null, id: "e4", piece_color: null}, 
+    "f4": {piece: null, id: "f4", piece_color: null}, 
+    "g4": {piece: null, id: "g4", piece_color: null}, 
+    "h4": {piece: null, id: "h4", piece_color: null}, 
+    "a5": {piece: null, id: "a5", piece_color: null}, 
+    "b5": {piece: null, id: "b5", piece_color: null}, 
+    "c5": {piece: null, id: "c5", piece_color: null}, 
+    "d5": {piece: null, id: "d5", piece_color: null}, 
+    "e5": {piece: null, id: "e5", piece_color: null}, 
+    "f5": {piece: null, id: "f5", piece_color: null}, 
+    "g5": {piece: null, id: "g5", piece_color: null}, 
+    "h5": {piece: null, id: "h5", piece_color: null}, 
+    "a6": {piece: null, id: "a6", piece_color: null}, 
+    "b6": {piece: null, id: "b6", piece_color: null}, 
+    "c6": {piece: null, id: "c6", piece_color: null}, 
+    "d6": {piece: null, id: "d6", piece_color: null}, 
+    "e6": {piece: null, id: "e6", piece_color: null}, 
+    "f6": {piece: null, id: "f6", piece_color: null}, 
+    "g6": {piece: null, id: "g6", piece_color: null}, 
+    "h6": {piece: null, id: "h6", piece_color: null}, 
+    "a7": {piece: null, id: "a7", piece_color: null}, 
+    "b7": {piece: null, id: "b7", piece_color: null}, 
+    "c7": {piece: null, id: "c7", piece_color: null}, 
+    "d7": {piece: null, id: "d7", piece_color: null}, 
+    "e7": {piece: null, id: "e7", piece_color: null}, 
+    "f7": {piece: null, id: "f7", piece_color: null}, 
+    "g7": {piece: null, id: "g7", piece_color: null}, 
+    "h7": {piece: null, id: "h7", piece_color: null}, 
+    "a8": {piece: null, id: "a8", piece_color: null}, 
+    "b8": {piece: null, id: "b8", piece_color: null}, 
+    "c8": {piece: null, id: "c8", piece_color: null}, 
+    "d8": {piece: null, id: "d8", piece_color: null}, 
+    "e8": {piece: null, id: "e8", piece_color: null}, 
+    "f8": {piece: null, id: "f8", piece_color: null}, 
+    "g8": {piece: null, id: "g8", piece_color: null}, 
+    "h8": {piece: null, id: "h8", piece_color: null}, 
 }
 
-export const board: any = {
-    "a1": {}, "b1": {}, "c1": {}, "d1": {}, "e1": {}, "f1": {}, "g1": {}, "h1": {},
-    "a2": {}, "b2": {}, "c2": {}, "d2": {}, "e2": {}, "f2": {}, "g2": {}, "h2": {},
-    "a3": {}, "b3": {}, "c3": {}, "d3": {}, "e3": {}, "f3": {}, "g3": {}, "h3": {},
-    "a4": {}, "b4": {}, "c4": {}, "d4": {}, "e4": {}, "f4": {}, "g4": {}, "h4": {},
-    "a5": {}, "b5": {}, "c5": {}, "d5": {}, "e5": {}, "f5": {}, "g5": {}, "h5": {},
-    "a6": {}, "b6": {}, "c6": {}, "d6": {}, "e6": {}, "f6": {}, "g6": {}, "h6": {},
-    "a7": {}, "b7": {}, "c7": {}, "d7": {}, "e7": {}, "f7": {}, "g7": {}, "h7": {},
-    "a8": {}, "b8": {}, "c8": {}, "d8": {}, "e8": {}, "f8": {}, "g8": {}, "h8": {}
-}
+interface pieces {
+    [key: string]: string;
+ }
+
+export const pieces: pieces= {"Wpawn": require("./images/Wpawn.png"), 
+                                "Wqueen": require("./images/Wqueen.png"), 
+                                "Wrook": require("./images/Wrook.png"), 
+                                "Wknight": require("./images/Wknight.png"), 
+                                "Wking": require("./images/Wking.png"), 
+                                "Wbishop": require("./images/Wbishop.png"),
+                                "Bpawn": require("./images/Bpawn.png"), 
+                                "Bqueen": require("./images/Bqueen.png"), 
+                                "Brook": require("./images/Brook.png"), 
+                                "Bknight": require("./images/Bknight.png"), 
+                                "Bking": require("./images/Bking.png"), 
+                                "Bbishop": require("./images/Bbishop.png") }
+

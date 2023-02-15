@@ -1,31 +1,21 @@
+import { move_piece_graphically } from "./graphics_handler";
 import { 
-    starting_pos, board_color, board   
+    starting_pos, board_color, c_board, board   
 } from "./initial.config";
 
-import { pieces } from "./pieces.config";
-
-export function intitial_game(){
+export function intitial_game(): board{
     Object.keys(starting_pos).forEach(val => {
-        board[val] = {"piece": starting_pos[val]}
+        c_board[val].piece = starting_pos[val].piece
+        c_board[val].piece_color = starting_pos[val].piece_color
       });
-      return board
+      return c_board;
 }
 
-export function move(current_click, c_board, box){
-    if (current_click.piece_selected) {
-        if (current_click.id === box.id){
-            current_click = {"piece_selected": false, "piece": "", "id": ""} 
-            console.log(current_click)   
-        } else {
-            box.innerHTML = `${current_click.piece} <img class='allimg' src="${pieces[current_click.piece]}" alt="">`
-            document.getElementById(current_click.id).innerHTML = ``
-            c_board[box.id].piece = `${current_click.piece}`
-            current_click = {"piece_selected": false, "piece": "", "id": ""}
-            console.log(document.getElementById(current_click.id))
-        }
-    } else {
-        if (c_board[box.id].piece !== undefined)
-            current_click = {"piece_selected": true, "piece": c_board[`${box.id}`].piece, "id": `${box.id}`}
-            console.log(current_click) 
-    }
+export function move_piece(to:string, from: string, c_board: board): board{
+       c_board[to].piece = c_board[from].piece
+       c_board[to].piece_color = c_board[from].piece_color
+       c_board[from].piece = null
+       c_board[from].piece_color = null
+       move_piece_graphically(to, from)
+       return c_board
 }
