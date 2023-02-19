@@ -17,5 +17,13 @@ export function move_piece(to:string, from: string, c_board: board): board{
        c_board[from].piece = null
        c_board[from].piece_color = null
        move_piece_graphically(to, from)
+       
        return c_board
+}
+
+export function invert_move(color: string): string {
+    return (color === "white")
+           ? "black"
+           : "white"
+
 }

@@ -6,9 +6,19 @@
 
 body {
     display: grid;
-    overflow-x: hidden;
-    width: 800px;
-    height: 800px;
+    height: 50vw; 
+    grid-template-columns: 1fr 2fr;
+} 
+
+information {
+    display: inline;
+    height: 50vw;
+}
+
+board {
+    display: grid;
+    width: 50vw;
+    height: 50vw;
 }
 
 h1 {
@@ -36,8 +46,8 @@ li {
 }
 
 .box {
-    width: 100px;
-    height: 100px;
+    width: 6.25vw;
+    height: 6.25vw;
     outline: 10px;
     outline-color: black;
 }
