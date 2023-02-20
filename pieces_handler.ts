@@ -1,6 +1,6 @@
 import { move_piece_graphically } from "./graphics_handler";
 import { 
-    starting_pos, board_color, c_board, board   
+    starting_pos, c_board, board, chess_box   
 } from "./initial.config";
 
 export function intitial_game(): board{
@@ -26,4 +26,17 @@ export function invert_move(color: string): string {
            ? "black"
            : "white"
 
+}
+
+export function legal_move(piece: chess_box): Array<string>{
+    const slot_value = parseInt(piece.id)
+    let legal_moves = []
+        if (piece.piece === "Wpawn") {
+            for(let i = slot_value; i >= slot_value - 10; i = i - 10){
+                legal_moves.push(i.toString())
+                console.log(i)
+            }
+        } else {}
+    console.log(legal_moves)
+    return legal_moves
 }

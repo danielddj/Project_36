@@ -11,7 +11,7 @@ import {
 
 export function arr_to_html(c_board: board): void {
     Object.keys(c_board).forEach(val => {
-        const current_element = $(val)
+        const current_element = document.getElementById(val)
         if (!is_null(current_element)) {
             if (c_board[val].piece !== null) {
                 current_element.innerHTML = `${c_board[val].piece} <img class='allimg' src="${pieces[c_board[val].piece]}" alt="">`

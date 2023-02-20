@@ -6,9 +6,13 @@ import {
     $$, deselect_piece   
 } from "./utilites";
 
+import { Queue } from 'queue-typescript';
+
 import { 
-    intitial_game, invert_move, move_piece 
+    intitial_game, invert_move, legal_move, move_piece 
 } from "./pieces_handler";
+
+
 
 let current_click = {"piece_selected": false,"piece":"", "id": "" }
 
@@ -21,14 +25,14 @@ $$(".box").forEach((box: any) => {
                 current_click = deselect_piece
                 console.log(current_click)   
             } else {
-                if(box.innerHTML === ""){
+                if(c_board.piece === null && legal_move(c_board[current_click.id]).includes(box.id)){
                     move_piece(box.id, current_click.id, c_board)
                     whos_turn = invert_move(whos_turn)
                     console.log(whos_turn) 
                     current_click = deselect_piece
                 } else if (c_board[current_click.id].piece_color === c_board[box.id].piece_color) {
-                    console.error("Same color!")
-                } else {
+                    console.log("Same color!")
+                } else if (legal_move(c_board[current_click.id]).includes(box.id)) {
                     move_piece(box.id, current_click.id, c_board)
                     whos_turn = invert_move(whos_turn) 
                     console.log(whos_turn)
