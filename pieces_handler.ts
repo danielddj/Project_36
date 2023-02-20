@@ -34,9 +34,13 @@ export function legal_move(piece: chess_box): Array<string>{
         if (piece.piece === "Wpawn") {
             for(let i = slot_value; i >= slot_value - 10; i = i - 10){
                 legal_moves.push(i.toString())
-                console.log(i)
             }
-        } else {}
+        } 
+        else if (piece.piece === "Bpawn") {
+            for(let i = slot_value; i <= slot_value + 10; i = i + 10){
+                legal_moves.push(i.toString())
+            }
+        } else{}
     console.log(legal_moves)
     return legal_moves
 }
