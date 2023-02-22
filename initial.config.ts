@@ -1,14 +1,16 @@
-export type chess_box ={
+export type square_type ={
     piece: string | null;
     id: string;
     piece_color: string | null
 }
 
-export interface board {
-    [key: string]: chess_box;
- }
+export type board_type = {
+    [key: string]: square_type;
+}
 
-export const starting_pos: board = {"01": {piece: "Brook", id: "01", piece_color: "black"}, 
+
+//The starting normal starting position of each piece
+export const starting_pos: board_type = {"01": {piece: "Brook", id: "01", piece_color: "black"}, 
                                     "02": {piece: "Bknight", id: "02", piece_color: "black"}, 
                                     "03": {piece: "Bbishop", id: "03", piece_color: "black"}, 
                                     "04": {piece: "Bqueen", id: "04", piece_color: "black"}, 
@@ -51,7 +53,9 @@ export const board_color: Array<string> = ["w", "b", "w", "b", "w", "b", "w", "b
                                     "b", "w", "b", "w", "b", "w", "b", "w",]
 
 
-export const c_board: board  = {
+
+//Our internal representation of the chess board, where each key-value pair is a square.                                    
+export const c_board: board_type  = {
     "01": {piece: null, id: "01", piece_color: null}, 
     "02": {piece: null, id: "02", piece_color: null}, 
     "03": {piece: null, id: "03", piece_color: null}, 
@@ -118,11 +122,14 @@ export const c_board: board  = {
     "78": {piece: null, id: "78", piece_color: null}, 
 }
 
-interface pieces {
-    [key: string]: string;
- }
 
-export const pieces: pieces= {"Wpawn": require("./images/Wpawn.png"), 
+interface pieces_type {
+    [key: string]: string;
+}
+
+
+//Neccesary to display images
+export const pieces: pieces_type= {"Wpawn": require("./images/Wpawn.png"), 
                                 "Wqueen": require("./images/Wqueen.png"), 
                                 "Wrook": require("./images/Wrook.png"), 
                                 "Wknight": require("./images/Wknight.png"), 
@@ -134,6 +141,7 @@ export const pieces: pieces= {"Wpawn": require("./images/Wpawn.png"),
                                 "Bknight": require("./images/Bknight.png"), 
                                 "Bking": require("./images/Bking.png"), 
                                 "Bbishop": require("./images/Bbishop.png") }
+
 
 
 

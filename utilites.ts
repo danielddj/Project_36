@@ -1,3 +1,4 @@
+//Just a document of shortcuts to make typing easier
 export function $(query: any): any{
 	return document.getElementById(query)	
 } 

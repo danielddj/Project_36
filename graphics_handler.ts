@@ -5,11 +5,14 @@ import {
 } from "./utilites";
 
 import { 
-    board_color, board, pieces,   
+    board_color, board_type, pieces,   
 } from "./initial.config";
 
-
-export function arr_to_html(c_board: board): void {
+/** Takes our back end representation of the chess board and displays it on the screen  
+  * @param c_board The chess board to display in html. 
+  * @returns Void, only edits the HTML to display pieces.
+  */
+export function obj_to_html(c_board: board_type): void {
     Object.keys(c_board).forEach(val => {
         const current_element = document.getElementById(val)
         if (!is_null(current_element)) {
@@ -23,6 +26,12 @@ export function arr_to_html(c_board: board): void {
     });
 }
 
+/** Moves a piece grapically on the screen  
+  * @param {string} to The ID of the square where the piece is moving to.
+  * @param {string} from The ID of the square where the piece is moving from. 
+  * @returns Void, only edits the HTML to display pieces.
+  */
+
 export function move_piece_graphically(to: string, from: string): void {
     $(to).innerHTML = $(from).innerHTML
     $(from).innerHTML = ""
@@ -30,6 +39,10 @@ export function move_piece_graphically(to: string, from: string): void {
     $(to).style.cursor = "pointer"
 }
 
+/** Makes each HTML box element the color it is supposed to be 
+ * and adds a black outline  
+  * @returns Void, only edits the HTML to display color.
+  */
 export function coloring() {
     const color = $$('.box') 
     let i: number = 0
