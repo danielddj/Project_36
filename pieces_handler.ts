@@ -74,9 +74,9 @@ export function legal_move(selected_piece: chess_box): Array<string>        // K
     switch (selected_piece.piece)
     {
         case "Wpawn":
-            if (turn_count === 1)
+            if (turn_count < 3 )
             {
-                for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) || working_square === working_square + UP * 2 ;working_square + UP)
+                for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) || working_square === working_square + (UP * 2) ;working_square + UP)
         {
                 legal_moves.push(working_square.toString())
         }
@@ -88,9 +88,9 @@ export function legal_move(selected_piece: chess_box): Array<string>        // K
             break;
         
         case "Bpawn":
-            if (turn_count === 1)
+            if (turn_count < 3 )
             {
-                for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) || working_square === working_square + DOWN * 2 ;working_square + DOWN)
+                for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) || working_square === working_square + (DOWN * 2) ;working_square + DOWN)
         {
                 legal_moves.push(working_square.toString())
         }
