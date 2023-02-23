@@ -63,11 +63,11 @@ function collision_check(target_square:number):boolean      // Hjälpfunktion so
 
 
 export function legal_move(selected_piece: chess_box): Array<string>        // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
-{                                                                       
+{                                                                           // TODO: pawns kan bara ta andra pjäser diagonalt och gå två steg första draget.
     let current_square:number = parseInt(selected_piece.id)                           
     let legal_moves: Array<string> = []
     let working_square:number 
-    let target_square
+    let target_square:number
     switch (selected_piece.piece)
     {
         case "Wpawn":
