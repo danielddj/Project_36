@@ -66,7 +66,7 @@ function collision_check(target_square:number):boolean      // Hjälpfunktion so
 
 
 export function legal_move(selected_piece: chess_box): Array<string>        // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
-{                                                                           // TODO: pawns kan bara ta andra pjäser diagonalt och gå två steg första draget.
+{                                                                           
     let current_square:number = parseInt(selected_piece.id)                           
     let legal_moves: Array<string> = []
     let working_square:number 
@@ -83,9 +83,18 @@ export function legal_move(selected_piece: chess_box): Array<string>        // K
             }     
 
             target_square = current_square + UP
-            if (bounds_check(target_square) || collision_check(target_square) )
+            if (bounds_check(target_square) && c_board[target_square].piece === null )
             legal_moves.push(target_square.toString())
-            break;
+
+            target_square = current_square + UP_LEFT
+            if (bounds_check(target_square) && collision_check(target_square))
+            legal_moves.push(target_square.toString())
+            
+            target_square = current_square + UP_RIGHT
+            if (bounds_check(target_square) && collision_check(target_square))
+            legal_moves.push(target_square.toString())
+            break; 
+
         
         case "Bpawn":
             if (turn_count < 3 )
@@ -96,7 +105,15 @@ export function legal_move(selected_piece: chess_box): Array<string>        // K
         }
             }   
             target_square = current_square + DOWN
-            if (bounds_check(target_square) || collision_check(target_square) )
+            if (bounds_check(target_square) && c_board[target_square].piece === null)
+            legal_moves.push(target_square.toString())
+           
+            target_square = current_square + DOWN_LEFT
+            if (bounds_check(target_square) && collision_check(target_square))
+            legal_moves.push(target_square.toString())
+            
+            target_square = current_square + DOWN_RIGHT
+            if (bounds_check(target_square) && collision_check(target_square))
             legal_moves.push(target_square.toString())
             break; 
 
