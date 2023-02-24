@@ -30,7 +30,10 @@ const DOWN_RIGHT = 11
 export function intitial_game(starting_pos: board_type): board_type{
     Object.keys(starting_pos).forEach(val => {
         c_board[val].piece = starting_pos[val].piece
-        c_board[val].piece_color = starting_pos[val].piece_color
+        c_board[val].piece.piece_color = starting_pos[val].piece.piece_color
+      });
+      Object.keys(starting_pos).forEach(val => {
+        c_board[val].piece.moves = legal_move(c_board[val])
       });
       return c_board;
 }
@@ -44,9 +47,7 @@ export function intitial_game(starting_pos: board_type): board_type{
 
 export function move_piece(to:string, from: string, c_board: board_type): board_type{
        c_board[to].piece = c_board[from].piece
-       c_board[to].piece_color = c_board[from].piece_color
        c_board[from].piece = null
-       c_board[from].piece_color = null
        move_piece_graphically(to, from)
        
        return c_board
@@ -67,55 +68,63 @@ export function invert_move(color: string): string {
 
 
 
-function check_bounds_collision(target_square: number, pawn: boolean, color: string): boolean {
-    function bounds_check():boolean {      // Hjälpfunktion som kollar om en pjäs rör sig inom brädet.
-        return (target_square % 10 > 0 && target_square % 10 < 8) && (target_square < 79 && target_square > 0) 
+function check_bounds_collision(target_square: number, pawn: boolean, selected_piece: square_type): boolean {
+    // Hjälpfunktion som kollar om en pjäs rör sig inom brädet.
+    function bounds_check():boolean {      
+        return (target_square % 10 > 0 && target_square % 10 < 8) && (target_square < 65 && target_square > 0) 
                ? true
                : false 
         
     }
 
-    function collision_check(): boolean {     // Hjälpfunktion som kollar om en pjäs möter en annan pjäs.
-        return c_board[target_square].piece === null || color !== c_board[target_square].piece_color
-               ? true
-               : false       
+    // Hjälpfunktion som kollar om en pjäs möter en annan pjäs.
+    function collision_check(): boolean {
+            if (selected_piece.piece.piece_color !== c_board[target_square].piece.piece_color){
+                return true
+            } else {
+                selected_piece.piece.dependants.push(c_board[target_square].id)
+                return false
+            }
     }
 
     function collision_check_pawn(): boolean{
-        return c_board[target_square].piece !== null || color !== c_board[target_square].piece_color
-               ? true
-               : false 
+            if (c_board[target_square].piece === null) {
+                return false
+            } else {
+                return (selected_piece.piece.piece_color === c_board[target_square].piece.piece_color)
+                       ? false
+                       : true
+            }
     }
 
     return pawn 
            ? bounds_check() && collision_check_pawn()
-           : bounds_check() && collision_check()
+           : bounds_check() && (c_board[target_square].piece === null || collision_check())
 }
 
-
-export function legal_move(selected_piece: square_type): Array<string>        // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
+// Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
+export function legal_move(selected_piece: square_type): Array<string>        
 {                                                                           
     let current_square:number = parseInt(selected_piece.id)                           
     let legal_moves: Array<string> = []
-    let working_square:number 
-    let target_square:number
+    let working_square: number 
+    let target_square: number
     const push = (target_square: number) => legal_moves.push(target_square.toString())
     
-    switch (selected_piece.piece)
+    switch (selected_piece.piece.piece_name)
     {
         case "Wpawn": 
-
             target_square = current_square + UP
             if (c_board[target_square].piece === null ){
                 push(target_square)
             }
             
             target_square = current_square + UP_LEFT
-            if (check_bounds_collision(target_square, true, "white")) {
+            if (check_bounds_collision(target_square, true, selected_piece)) {
                 push(target_square)
             }
             target_square = current_square + UP_RIGHT
-            if (check_bounds_collision(target_square, true, "white")) {
+            if (check_bounds_collision(target_square, true, selected_piece)) {
                 push(target_square)
             }
 
@@ -129,12 +138,12 @@ export function legal_move(selected_piece: square_type): Array<string>        //
             }
             
             target_square = current_square + DOWN_LEFT
-            if (check_bounds_collision(target_square, true, "black")) {
+            if (check_bounds_collision(target_square, true, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + DOWN_RIGHT
-            if (check_bounds_collision(target_square, true, "black")) {
+            if (check_bounds_collision(target_square, true, selected_piece)) {
                 push(target_square)
             }
                 
@@ -143,144 +152,139 @@ export function legal_move(selected_piece: square_type): Array<string>        //
         
 
         case "Wking":
-            
             target_square = current_square + UP
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
         
             target_square = current_square + DOWN
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             } 
 
             target_square = current_square + LEFT
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + RIGHT 
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + UP_LEFT
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + UP_RIGHT 
-                   if (check_bounds_collision(target_square, false, "white")) {
+                   if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + DOWN_LEFT 
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + DOWN_RIGHT    
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             } 
 
         break;
     
-        
-
         case "Bking":
             target_square = current_square + UP
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + DOWN
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             } 
 
             target_square = current_square + LEFT
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + RIGHT 
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + UP_LEFT
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + UP_RIGHT 
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             } 
 
             target_square = current_square + DOWN_LEFT
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
         
             target_square = current_square + DOWN_RIGHT       
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
         break;
-        
-        
+          
         case "Wrook":
             working_square = current_square
-            while(check_bounds_collision(working_square + UP, false, "white")){
+            while(check_bounds_collision(working_square + UP, false, selected_piece)){
                 working_square = working_square + UP
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN, false, "white")){
+            while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + LEFT, false, "white")){
+            while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
             }
             
         break; 
 
-          
         case "Brook":
             working_square = current_square
-            while(check_bounds_collision(working_square + UP, false, "black")){
+            while(check_bounds_collision(working_square + UP, false, selected_piece)){
                 working_square = working_square + UP
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN, false, "black")){
+            while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + LEFT, false, "black")){
+            while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + RIGHT, false, "black")){
+            while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
             }
@@ -289,25 +293,25 @@ export function legal_move(selected_piece: square_type): Array<string>        //
 
         case "Wbishop":
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_LEFT, false, "white")){
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_LEFT, false, "white")){
+            while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
             }
@@ -316,25 +320,25 @@ export function legal_move(selected_piece: square_type): Array<string>        //
 
         case "Bbishop":
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "black")){
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_LEFT, false, "black")){
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_RIGHT, false, "black")){
+            while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_LEFT, false, "black")){
+            while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
             }
@@ -343,49 +347,49 @@ export function legal_move(selected_piece: square_type): Array<string>        //
         
         case "Wqueen":
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_LEFT, false, "white")){
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_LEFT, false, "white")){
+            while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP, false, "white")){
+            while(check_bounds_collision(working_square + UP, false, selected_piece)){
                 working_square = working_square + UP
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN, false, "white")){
+            while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + LEFT, false, "white")){
+            while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
             }
@@ -394,93 +398,93 @@ export function legal_move(selected_piece: square_type): Array<string>        //
 
         case "Bqueen":
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN_LEFT, false, "white")){
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP_LEFT, false, "white")){
+            while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + UP, false, "white")){
+            while(check_bounds_collision(working_square + UP, false, selected_piece)){
                 working_square = working_square + UP
                 push(working_square)
             }
         
             working_square = current_square
-            while(check_bounds_collision(working_square + DOWN, false, "white")){
+            while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + LEFT, false, "white")){
+            while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
-            while(check_bounds_collision(working_square + RIGHT, false, "white")){
+            while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
             }
-            
+
         break;
          
         case "Wknight":
             target_square = current_square + (UP * 2 + LEFT)
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (UP * 2 + RIGHT)
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             } 
 
             target_square = current_square + (DOWN * 2 + LEFT)
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (DOWN * 2 + RIGHT)
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             } 
 
             target_square = current_square + (LEFT * 2 + UP) 
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (LEFT * 2 + DOWN) 
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (RIGHT * 2 + UP) 
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (RIGHT * 2 + DOWN)    
-            if (check_bounds_collision(target_square, false, "white")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
@@ -489,42 +493,42 @@ export function legal_move(selected_piece: square_type): Array<string>        //
 
         case "Bknight":
             target_square = current_square + (UP * 2 + LEFT)
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (UP * 2 + RIGHT)
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (DOWN * 2 + LEFT)
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (DOWN * 2 + RIGHT)
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             } 
 
             target_square = current_square + (LEFT * 2 + UP) 
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (LEFT * 2 + DOWN) 
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (RIGHT * 2 + UP) 
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 
             target_square = current_square + (RIGHT * 2 + DOWN)    
-            if (check_bounds_collision(target_square, false, "black")) {
+            if (check_bounds_collision(target_square, false, selected_piece)) {
                 push(target_square)
             }
 

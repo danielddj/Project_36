@@ -18,8 +18,9 @@ export function obj_to_html(c_board: board_type): void {
         const current_element = document.getElementById(val)
         if (!is_null(current_element)) {
             if (c_board[val].piece !== null) {
-                current_element.innerHTML = `${c_board[val].piece} <img class='allimg' src="${pieces[c_board[val].piece]}" alt="">`
+                current_element.innerHTML = `${c_board[val].piece} <img class='allimg' src="${pieces[c_board[val].piece.piece_name]}" alt="">`
                 current_element.style.cursor = 'pointer' 
+                console.log(c_board[val].piece.dependants)
             } else {}  
         } else {
             console.error("Error, null in current_element", current_element)

@@ -23,6 +23,7 @@ let whos_turn = "white"
 
 $$(".box").forEach((box: any) => {
     box.addEventListener('click', function(){
+        console.log(c_board[box.id].piece)
         if (current_click.piece_selected) {
             if (current_click.id === box.id){
                 current_click = deselect_piece
@@ -38,8 +39,8 @@ $$(".box").forEach((box: any) => {
             }
         }
         } else {
-            if (c_board[box.id].piece !== null && whos_turn === c_board[box.id].piece_color){
-                current_click = {"piece_selected": true, "piece": c_board[`${box.id}`].piece, "id": `${box.id}`}
+            if (c_board[box.id].piece !== null && whos_turn === c_board[box.id].piece.piece_color){
+                current_click = {"piece_selected": true, "piece": c_board[`${box.id}`].piece.piece_name, "id": `${box.id}`}
                 console.log(current_click) 
             } else {
                 return (c_board[box.id].piece === null)
