@@ -9,6 +9,7 @@ import {
 import { 
     intitial_game, invert_move, legal_move, move_piece 
 } from "./pieces_handler";
+import { starting_pos } from "./initial.config";
 
 
 let current_click = {"piece_selected": false, "piece":"", "id": ""}
@@ -49,7 +50,7 @@ $$(".box").forEach((box: any) => {
     })
 })
 
-let c_board = intitial_game()
+let c_board = intitial_game(starting_pos)
 
 obj_to_html(c_board)
 

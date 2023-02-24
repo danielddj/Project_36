@@ -3,7 +3,7 @@ import {
 } from "./graphics_handler";
 
 import { 
-    starting_pos, c_board, board_type, square_type   
+    board_type, square_type, c_board   
 } from "./initial.config";
 
 /** Takes a list of all the pieces and the id where they are supposed to be and
@@ -13,7 +13,7 @@ import {
   * @returns c_board with all the pieces in the corresponding slot.
   */
 
-export function intitial_game(c_board: board_type): board_type{
+export function intitial_game(starting_pos: board_type): board_type{
     Object.keys(starting_pos).forEach(val => {
         c_board[val].piece = starting_pos[val].piece
         c_board[val].piece_color = starting_pos[val].piece_color
