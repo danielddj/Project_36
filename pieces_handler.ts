@@ -67,76 +67,77 @@ export function invert_move(color: string): string {
 
 
 
-
-function bounds_check(target_square:number):boolean      // Hjälpfunktion som kollar om en pjäs rör sig inom brädet.
-{   
-    return target_square > 1 || target_square < 78
-    ?true
-    :false 
-    
-}
-
-function collision_check(target_square:number):boolean      // Hjälpfunktion som kollar om en pjäs möter en annan pjäs.
-{
-   return c_board[target_square].piece === null || c_board[target_square].piece_color !== c_board[target_square].piece_color
-   ?true
-   :false 
+function check_bounds_collision(target_square: number, pawn: boolean, color: string): boolean {
+    function bounds_check():boolean {      // Hjälpfunktion som kollar om en pjäs rör sig inom brädet.
+        return (target_square % 10 > 0 && target_square % 10 < 8) && (target_square < 79 && target_square > 0) 
+               ? true
+               : false 
         
+    }
+
+    function collision_check(): boolean {     // Hjälpfunktion som kollar om en pjäs möter en annan pjäs.
+        return c_board[target_square].piece === null || color !== c_board[target_square].piece_color
+               ? true
+               : false       
+    }
+
+    function collision_check_pawn(): boolean{
+        return c_board[target_square].piece !== null || color !== c_board[target_square].piece_color
+               ? true
+               : false 
+    }
+
+    return pawn 
+           ? bounds_check() && collision_check_pawn()
+           : bounds_check() && collision_check()
 }
 
 
-
-
-export function legal_move(selected_piece: chess_box): Array<string>        // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
+export function legal_move(selected_piece: square_type): Array<string>        // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
 {                                                                           
     let current_square:number = parseInt(selected_piece.id)                           
     let legal_moves: Array<string> = []
     let working_square:number 
     let target_square:number
+    const push = (target_square: number) => legal_moves.push(target_square.toString())
+    
     switch (selected_piece.piece)
     {
-        case "Wpawn":
-            if (turn_count < 3 )
-            {
-                for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) || working_square === working_square + (UP * 2) ;working_square + UP)
-        {
-                legal_moves.push(working_square.toString())
-        }
-            }     
+        case "Wpawn": 
 
             target_square = current_square + UP
-            if (bounds_check(target_square) && c_board[target_square].piece === null )
-            legal_moves.push(target_square.toString())
-
-            target_square = current_square + UP_LEFT
-            if (bounds_check(target_square) && collision_check(target_square))
-            legal_moves.push(target_square.toString())
+            if (c_board[target_square].piece === null ){
+                push(target_square)
+            }
             
+            target_square = current_square + UP_LEFT
+            if (check_bounds_collision(target_square, true, "white")) {
+                push(target_square)
+            }
             target_square = current_square + UP_RIGHT
-            if (bounds_check(target_square) && collision_check(target_square))
-            legal_moves.push(target_square.toString())
+            if (check_bounds_collision(target_square, true, "white")) {
+                push(target_square)
+            }
+
             break; 
 
         
         case "Bpawn":
-            if (turn_count < 3 )
-            {
-                for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) || working_square === working_square + (DOWN * 2) ;working_square + DOWN)
-        {
-                legal_moves.push(working_square.toString())
-        }
-            }   
             target_square = current_square + DOWN
-            if (bounds_check(target_square) && c_board[target_square].piece === null)
-            legal_moves.push(target_square.toString())
-           
-            target_square = current_square + DOWN_LEFT
-            if (bounds_check(target_square) && collision_check(target_square))
-            legal_moves.push(target_square.toString())
+            if (c_board[target_square].piece === null) {
+                push(target_square)
+            }
             
+            target_square = current_square + DOWN_LEFT
+            if (check_bounds_collision(target_square, true, "black")) {
+                push(target_square)
+            }
+
             target_square = current_square + DOWN_RIGHT
-            if (bounds_check(target_square) && collision_check(target_square))
-            legal_moves.push(target_square.toString())
+            if (check_bounds_collision(target_square, true, "black")) {
+                push(target_square)
+            }
+                
             break; 
 
         
@@ -144,350 +145,391 @@ export function legal_move(selected_piece: chess_box): Array<string>        // K
         case "Wking":
             
             target_square = current_square + UP
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-        legal_moves.push(target_square.toString())
-        }
-        target_square = current_square + DOWN
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + LEFT
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + RIGHT 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + UP_LEFT
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + UP_RIGHT 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + DOWN_LEFT 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + DOWN_RIGHT    
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }  
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+        
+            target_square = current_square + DOWN
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            } 
+
+            target_square = current_square + LEFT
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + RIGHT 
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + UP_LEFT
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + UP_RIGHT 
+                   if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + DOWN_LEFT 
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + DOWN_RIGHT    
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            } 
+
         break;
     
         
 
         case "Bking":
             target_square = current_square + UP
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-        legal_moves.push(target_square.toString())
-        }
-        target_square = current_square + DOWN
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + LEFT
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + RIGHT 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-            
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + UP_LEFT
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-            
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + UP_RIGHT 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + DOWN_LEFT
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + DOWN
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            } 
+
+            target_square = current_square + LEFT
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + RIGHT 
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + UP_LEFT
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + UP_RIGHT 
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            } 
+
+            target_square = current_square + DOWN_LEFT
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
         
-        target_square = current_square + DOWN_RIGHT       
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
+            target_square = current_square + DOWN_RIGHT       
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
         break;
         
         
         case "Wrook":
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP)
-        {
-                legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP, false, "white")){
+                working_square = working_square + UP
+                push(working_square)
+            }
         
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN, false, "white")){
+                working_square = working_square + DOWN
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + LEFT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + LEFT, false, "white")){
+                working_square = working_square + LEFT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + RIGHT, false, "white")){
+                working_square = working_square + RIGHT
+                push(working_square)
+            }
+            
         break; 
 
-            
+          
         case "Brook":
-        for(working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP)
-            {
-                legal_moves.push(working_square.toString())
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP, false, "black")){
+                working_square = working_square + UP
+                push(working_square)
             }
         
-        for (working_square = current_square ; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN, false, "black")){
+                working_square = working_square + DOWN
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + LEFT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + LEFT, false, "black")){
+                working_square = working_square + LEFT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + RIGHT, false, "black")){
+                working_square = working_square + RIGHT
+                push(working_square)
+            }
+            
+        break; 
 
         case "Wbishop":
-        for(working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_LEFT)
-            {
-                legal_moves.push(working_square.toString())
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "white")){
+                working_square = working_square + DOWN_RIGHT
+                push(working_square)
             }
         
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, "white")){
+                working_square = working_square + DOWN_LEFT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN_LEFT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_RIGHT, false, "white")){
+                working_square = working_square + UP_RIGHT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN_RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_LEFT, false, "white")){
+                working_square = working_square + UP_LEFT
+                push(working_square)
+            }
+
+            break;
 
         case "Bbishop":
-        for(working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_LEFT)
-            {
-                legal_moves.push(working_square.toString())
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "black")){
+                working_square = working_square + DOWN_RIGHT
+                push(working_square)
             }
         
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, "black")){
+                working_square = working_square + DOWN_LEFT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN_LEFT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_RIGHT, false, "black")){
+                working_square = working_square + UP_RIGHT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN_RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_LEFT, false, "black")){
+                working_square = working_square + UP_LEFT
+                push(working_square)
+            }
+
+            break;
         
         case "Wqueen":
-        for(working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP)
-        {
-            legal_moves.push(working_square.toString())
-        }
-        
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN)
-        {
-            legal_moves.push(working_square.toString())
-        }
-
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + LEFT)
-        {
-            legal_moves.push(working_square.toString())
-        }
-
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
-        for(working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_LEFT)
-            {
-                legal_moves.push(working_square.toString())
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "white")){
+                working_square = working_square + DOWN_RIGHT
+                push(working_square)
             }
         
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, "white")){
+                working_square = working_square + DOWN_LEFT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN_LEFT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_RIGHT, false, "white")){
+                working_square = working_square + UP_RIGHT
+                push(working_square)
+            }
 
-        for (working_square = current_square; (collision_check(working_square) || bounds_check(current_square)) ;working_square + DOWN_RIGHT)
-        {
-            legal_moves.push(working_square.toString())
-        }
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_LEFT, false, "white")){
+                working_square = working_square + UP_LEFT
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP, false, "white")){
+                working_square = working_square + UP
+                push(working_square)
+            }
+        
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN, false, "white")){
+                working_square = working_square + DOWN
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + LEFT, false, "white")){
+                working_square = working_square + LEFT
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + RIGHT, false, "white")){
+                working_square = working_square + RIGHT
+                push(working_square)
+            }
+
         break;
 
         case "Bqueen":
-            for(working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP)
-            {
-                legal_moves.push(working_square.toString())
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_RIGHT, false, "white")){
+                working_square = working_square + DOWN_RIGHT
+                push(working_square)
+            }
+        
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN_LEFT, false, "white")){
+                working_square = working_square + DOWN_LEFT
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_RIGHT, false, "white")){
+                working_square = working_square + UP_RIGHT
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP_LEFT, false, "white")){
+                working_square = working_square + UP_LEFT
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + UP, false, "white")){
+                working_square = working_square + UP
+                push(working_square)
+            }
+        
+            working_square = current_square
+            while(check_bounds_collision(working_square + DOWN, false, "white")){
+                working_square = working_square + DOWN
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + LEFT, false, "white")){
+                working_square = working_square + LEFT
+                push(working_square)
+            }
+
+            working_square = current_square
+            while(check_bounds_collision(working_square + RIGHT, false, "white")){
+                working_square = working_square + RIGHT
+                push(working_square)
             }
             
-            for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN)
-            {
-                legal_moves.push(working_square.toString())
-            }
-    
-            for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + LEFT)
-            {
-                legal_moves.push(working_square.toString())
-            }
-    
-            for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + RIGHT)
-            {
-                legal_moves.push(working_square.toString())
-            }
-            for(working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_LEFT)
-                {
-                    legal_moves.push(working_square.toString())
-                }
-            
-            for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + UP_RIGHT)
-            {
-                legal_moves.push(working_square.toString())
-            }
-    
-            for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN_LEFT)
-            {
-                legal_moves.push(working_square.toString())
-            }
-    
-            for (working_square = current_square; (collision_check(working_square) || bounds_check(working_square)) ;working_square + DOWN_RIGHT)
-            {
-                legal_moves.push(working_square.toString())
-            }
-            break;
+        break;
          
         case "Wknight":
-        target_square = current_square + (UP * 2 + LEFT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-        legal_moves.push(target_square.toString())
-        }
-        target_square = current_square + (UP * 2 + RIGHT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + (DOWN * 2 + LEFT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (DOWN * 2 + RIGHT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + (LEFT * 2 + UP) 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (LEFT * 2 + DOWN) 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (RIGHT * 2 + UP) 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (RIGHT * 2 + DOWN)    
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())
-        }
+            target_square = current_square + (UP * 2 + LEFT)
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (UP * 2 + RIGHT)
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            } 
+
+            target_square = current_square + (DOWN * 2 + LEFT)
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (DOWN * 2 + RIGHT)
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            } 
+
+            target_square = current_square + (LEFT * 2 + UP) 
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (LEFT * 2 + DOWN) 
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (RIGHT * 2 + UP) 
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (RIGHT * 2 + DOWN)    
+            if (check_bounds_collision(target_square, false, "white")) {
+                push(target_square)
+            }
+
         break;
 
 
         case "Bknight":
-        target_square = current_square + (UP * 2 + LEFT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-        legal_moves.push(target_square.toString())
-        }
-        target_square = current_square + (UP * 2 + RIGHT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + (DOWN * 2 + LEFT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (DOWN * 2 + RIGHT)
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        } 
-        target_square = current_square + (LEFT * 2 + UP) 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (LEFT * 2 + DOWN) 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (RIGHT * 2 + UP) 
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())   
-        }
-        target_square = current_square + (RIGHT * 2 + DOWN)    
-        if (bounds_check(target_square) && collision_check(target_square))
-        {
-         legal_moves.push(target_square.toString())
-        }
+            target_square = current_square + (UP * 2 + LEFT)
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (UP * 2 + RIGHT)
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (DOWN * 2 + LEFT)
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (DOWN * 2 + RIGHT)
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            } 
+
+            target_square = current_square + (LEFT * 2 + UP) 
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (LEFT * 2 + DOWN) 
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (RIGHT * 2 + UP) 
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
+            target_square = current_square + (RIGHT * 2 + DOWN)    
+            if (check_bounds_collision(target_square, false, "black")) {
+                push(target_square)
+            }
+
         break;
+        
     }  
 
     console.log(legal_moves)

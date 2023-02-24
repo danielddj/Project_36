@@ -33,8 +33,8 @@ $$(".box").forEach((box: any) => {
                     whos_turn = invert_move(whos_turn)
                     console.log(whos_turn) 
                     current_click = deselect_piece
-                } else if (c_board[current_click.id].piece_color === c_board[box.id].piece_color) {
-                    console.log("Same color!")
+                } else {
+                    console.log("Illegal move!")
             }
         }
         } else {

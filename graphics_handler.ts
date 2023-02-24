@@ -12,6 +12,7 @@ import {
   * @param c_board The chess board to display in html. 
   * @returns Void, only edits the HTML to display pieces.
   */
+
 export function obj_to_html(c_board: board_type): void {
     Object.keys(c_board).forEach(val => {
         const current_element = document.getElementById(val)
