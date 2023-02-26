@@ -20,7 +20,7 @@ export let in_check_w = false
 
 export let in_check_b = false
 
-export let Wking_slot = "75"
+export let Wking_slot = "35"
 
 export let Bking_slot = "5"
 
@@ -43,6 +43,8 @@ export function intitial_game(starting_pos: board_type): board_type{
       Object.keys(starting_pos).forEach(val => {
         c_board[val].piece.moves = legal_move(c_board[val])
       });
+      c_board[Wking_slot].piece.moves = c_board[Wking_slot].piece.moves.filter(id => {return !move_into_check_w().includes(id)})
+      c_board[Bking_slot].piece.moves = c_board[Bking_slot].piece.moves.filter(id => {return !move_into_check_b().includes(id)})
       return c_board;
 }
 
@@ -69,20 +71,14 @@ export function move_piece(to:string, from: string, c_board: board_type): board_
 
 export function update_moves(){
     Object.keys(c_board).forEach(val => {
-        console.log(Wking_slot)
         if (c_board[val].piece !== null) {
             const legal_moves = legal_move(c_board[val])
             c_board[val].piece.moves = legal_moves
             console.log(legal_moves)
-            if (legal_moves.includes(Wking_slot) && c_board[val].piece.piece_name !== "Wking") {
-                in_check_w = true
-                console.log(in_check_w)
-            } else if (legal_moves.includes(Bking_slot) && c_board[val].piece.piece_name !== "Bking") {
-                in_check_b = true
-                console.log(Bking_slot)
-            }
         }
       });
+      c_board[Wking_slot].piece.moves = c_board[Wking_slot].piece.moves.filter(id => {return !move_into_check_w().includes(id)})
+      c_board[Bking_slot].piece.moves = c_board[Bking_slot].piece.moves.filter(id => {return !move_into_check_b().includes(id)})
 }
 
 
@@ -135,10 +131,50 @@ function check_bounds_collision(target_square: number, pawn: boolean, selected_p
             }
     }
 
-    return pawn 
-           ? bounds_check() && collision_check_pawn()
-           : bounds_check() && collision_check()
+    return pawn
+              ? bounds_check() && collision_check_pawn()
+              : bounds_check() && collision_check()
 }
+
+export function move_into_check_w(): any {
+    let temp_board: any
+    temp_board = c_board
+    let illegal_moves: Array<string> = []
+    legal_move(temp_board[Wking_slot]).forEach(target_square => {
+        temp_board[target_square].piece = temp_board[Wking_slot].piece
+        temp_board[Wking_slot].piece = null
+        Object.keys(temp_board).forEach(val => {
+            if (temp_board[val].piece !== null && legal_move(temp_board[val]).includes(target_square.toString())
+                 && temp_board[val].piece.piece_color !== "white" && !illegal_moves.includes(target_square.toString())) {
+                illegal_moves.push(target_square.toString())
+            }
+            });
+            temp_board[Wking_slot].piece = temp_board[target_square].piece
+            temp_board[target_square].piece = null
+    });
+    return illegal_moves
+}
+
+export function move_into_check_b(): any {
+    let temp_board: any
+    temp_board = c_board
+    let illegal_moves: Array<string> = []
+    legal_move(temp_board[Bking_slot]).forEach(target_square => {
+        temp_board[target_square].piece = temp_board[Bking_slot].piece
+        temp_board[Bking_slot].piece = null
+        Object.keys(temp_board).forEach(val => {
+            if (temp_board[val].piece !== null && legal_move(temp_board[val]).includes(target_square.toString())
+                 && temp_board[val].piece.piece_color !== "black" && !illegal_moves.includes(target_square.toString())) {
+                illegal_moves.push(target_square.toString())
+            }
+            });
+            temp_board[Bking_slot].piece = temp_board[target_square].piece
+            temp_board[target_square].piece = null
+    });
+    return illegal_moves
+}
+
+
 
 // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
 export function legal_move(selected_piece: square_type): Array<string>        
@@ -151,38 +187,51 @@ export function legal_move(selected_piece: square_type): Array<string>
     
     switch (selected_piece.piece.piece_name)
     {
-        case "Wpawn": 
+        case "Wpawn":
+            selected_piece.piece.pawn_moves = []
             target_square = current_square + UP
             if (c_board[target_square].piece === null ){
                 push(target_square)
             }
             
             target_square = current_square + UP_LEFT
-            if (check_bounds_collision(target_square, true, selected_piece)) {
-                push(target_square)
+            if (check_bounds_collision(target_square, false, selected_piece)) {
+                selected_piece.piece.pawn_moves.push(target_square.toString())
+                if (check_bounds_collision(target_square, true, selected_piece)) {
+                    push(target_square)
+                }
             }
             target_square = current_square + UP_RIGHT
-            if (check_bounds_collision(target_square, true, selected_piece)) {
-                push(target_square)
+            if (check_bounds_collision(target_square, false, selected_piece)) {
+                selected_piece.piece.pawn_moves.push(target_square.toString())
+                if (check_bounds_collision(target_square, true, selected_piece)) {
+                    push(target_square)
+                }
             }
 
             break; 
 
         
         case "Bpawn":
+            selected_piece.piece.pawn_moves = []
             target_square = current_square + DOWN
             if (c_board[target_square].piece === null) {
                 push(target_square)
             }
             
             target_square = current_square + DOWN_LEFT
-            if (check_bounds_collision(target_square, true, selected_piece)) {
-                push(target_square)
+            if (check_bounds_collision(target_square, false, selected_piece)) {
+                selected_piece.piece.pawn_moves.push(target_square.toString())
+                if (check_bounds_collision(target_square, true, selected_piece)) {
+                    push(target_square)
+                }
             }
-
             target_square = current_square + DOWN_RIGHT
-            if (check_bounds_collision(target_square, true, selected_piece)) {
-                push(target_square)
+            if (check_bounds_collision(target_square, false, selected_piece)) {
+                selected_piece.piece.pawn_moves.push(target_square.toString())
+                if (check_bounds_collision(target_square, true, selected_piece)) {
+                    push(target_square)
+                }
             }
                 
             break; 
@@ -604,6 +653,7 @@ export function legal_move(selected_piece: square_type): Array<string>
         break;
         
     }
+    
     return legal_moves
     
 }

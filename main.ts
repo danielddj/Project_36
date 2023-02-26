@@ -59,6 +59,3 @@ let c_board = intitial_game(starting_pos)
 obj_to_html(c_board)
 
 coloring();
-
-
-
