@@ -16,6 +16,14 @@ import {
 
 let turn_count = 1
 
+export let in_check_w = false
+
+export let in_check_b = false
+
+export let Wking_slot = "75"
+
+export let Bking_slot = "5"
+
 //Riktningar att röra sig.
 const UP = -10
 const DOWN = 10
@@ -45,13 +53,38 @@ export function intitial_game(starting_pos: board_type): board_type{
   * @returns c_board, the updated data structure.
   */
 
-export function move_piece(to:string, from: string, c_board: board_type): board_type{
-       c_board[to].piece = c_board[from].piece
-       c_board[from].piece = null
-       move_piece_graphically(to, from)
-       
-       return c_board
+export function move_piece(to:string, from: string, c_board: board_type): board_type{   
+    c_board[to].piece = c_board[from].piece
+    c_board[from].piece = null
+    move_piece_graphically(to, from)
+
+    if (c_board[to].piece.piece_name === "Wking") {
+        Wking_slot = to
+    } else if (c_board[to].piece.piece_name === "Bking") {
+        Bking_slot = to
+    }
+
+    return c_board
 }
+
+export function update_moves(){
+    Object.keys(c_board).forEach(val => {
+        console.log(Wking_slot)
+        if (c_board[val].piece !== null) {
+            const legal_moves = legal_move(c_board[val])
+            c_board[val].piece.moves = legal_moves
+            console.log(legal_moves)
+            if (legal_moves.includes(Wking_slot) && c_board[val].piece.piece_name !== "Wking") {
+                in_check_w = true
+                console.log(in_check_w)
+            } else if (legal_moves.includes(Bking_slot) && c_board[val].piece.piece_name !== "Bking") {
+                in_check_b = true
+                console.log(Bking_slot)
+            }
+        }
+      });
+}
+
 
 /** Changes the color of the one who is moving next.
   * @param {string} color The color of the one who did the move
@@ -62,16 +95,15 @@ export function invert_move(color: string): string {
     turn_count = turn_count + 1
     return (color === "white")
            ? "black" 
-           : "white" 
-            
+           : "white"             
 }
 
 
-
+let first_collision = true
 function check_bounds_collision(target_square: number, pawn: boolean, selected_piece: square_type): boolean {
     // Hjälpfunktion som kollar om en pjäs rör sig inom brädet.
     function bounds_check():boolean {      
-        return (target_square % 10 > 0 && target_square % 10 < 8) && (target_square < 65 && target_square > 0) 
+        return (target_square % 10 > 0 && target_square % 10 <= 8) && (target_square < 79 && target_square > 0) 
                ? true
                : false 
         
@@ -79,10 +111,16 @@ function check_bounds_collision(target_square: number, pawn: boolean, selected_p
 
     // Hjälpfunktion som kollar om en pjäs möter en annan pjäs.
     function collision_check(): boolean {
-            if (selected_piece.piece.piece_color !== c_board[target_square].piece.piece_color){
+            if ((c_board[target_square].piece !== null)){
+                if (selected_piece.piece.piece_color !== c_board[target_square].piece.piece_color && first_collision){
+                    first_collision = false
+                    return true
+                } else{
+                    return false
+                }
+            } else if (c_board[target_square].piece === null && first_collision) {
                 return true
-            } else {
-                selected_piece.piece.dependants.push(c_board[target_square].id)
+            } else {        
                 return false
             }
     }
@@ -99,7 +137,7 @@ function check_bounds_collision(target_square: number, pawn: boolean, selected_p
 
     return pawn 
            ? bounds_check() && collision_check_pawn()
-           : bounds_check() && (c_board[target_square].piece === null || collision_check())
+           : bounds_check() && collision_check()
 }
 
 // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
@@ -239,24 +277,28 @@ export function legal_move(selected_piece: square_type): Array<string>
           
         case "Wrook":
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP, false, selected_piece)){
                 working_square = working_square + UP
                 push(working_square)
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
@@ -266,24 +308,28 @@ export function legal_move(selected_piece: square_type): Array<string>
 
         case "Brook":
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP, false, selected_piece)){
                 working_square = working_square + UP
                 push(working_square)
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
@@ -293,24 +339,28 @@ export function legal_move(selected_piece: square_type): Array<string>
 
         case "Wbishop":
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
@@ -320,24 +370,28 @@ export function legal_move(selected_piece: square_type): Array<string>
 
         case "Bbishop":
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
@@ -347,48 +401,56 @@ export function legal_move(selected_piece: square_type): Array<string>
         
         case "Wqueen":
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP, false, selected_piece)){
                 working_square = working_square + UP
                 push(working_square)
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
@@ -398,24 +460,28 @@ export function legal_move(selected_piece: square_type): Array<string>
 
         case "Bqueen":
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_RIGHT, false, selected_piece)){
                 working_square = working_square + DOWN_RIGHT
                 push(working_square)
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN_LEFT, false, selected_piece)){
                 working_square = working_square + DOWN_LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_RIGHT, false, selected_piece)){
                 working_square = working_square + UP_RIGHT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + UP_LEFT, false, selected_piece)){
                 working_square = working_square + UP_LEFT
                 push(working_square)
@@ -428,18 +494,21 @@ export function legal_move(selected_piece: square_type): Array<string>
             }
         
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + DOWN, false, selected_piece)){
                 working_square = working_square + DOWN
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + LEFT, false, selected_piece)){
                 working_square = working_square + LEFT
                 push(working_square)
             }
 
             working_square = current_square
+            first_collision = true
             while(check_bounds_collision(working_square + RIGHT, false, selected_piece)){
                 working_square = working_square + RIGHT
                 push(working_square)
@@ -534,9 +603,7 @@ export function legal_move(selected_piece: square_type): Array<string>
 
         break;
         
-    }  
-
-    console.log(legal_moves)
+    }
     return legal_moves
+    
 }
-

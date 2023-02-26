@@ -7,7 +7,7 @@ import {
 } from "./utilites";
 
 import { 
-    intitial_game, invert_move, legal_move, move_piece 
+    intitial_game, invert_move, legal_move, move_piece, update_moves 
 } from "./pieces_handler";
 import { starting_pos } from "./initial.config";
 
@@ -15,6 +15,8 @@ import { starting_pos } from "./initial.config";
 let current_click = {"piece_selected": false, "piece":"", "id": ""}
 
 let whos_turn = "white"
+
+
 
 /** Is not relly a function, adds event listeners to each HTMLElement called box (square) 
  * so that it is listening to moves. Does the appropriate checks for the move, and then
@@ -29,11 +31,12 @@ $$(".box").forEach((box: any) => {
                 current_click = deselect_piece
                 console.log(current_click)   
             } else {
-                if(legal_move(c_board[current_click.id]).includes(box.id)){
+                if(c_board[current_click.id].piece.moves.includes(box.id)){
                     move_piece(box.id, current_click.id, c_board)
                     whos_turn = invert_move(whos_turn)
                     console.log(whos_turn) 
                     current_click = deselect_piece
+                    update_moves()
                 } else {
                     console.log("Illegal move!")
             }
