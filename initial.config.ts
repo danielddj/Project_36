@@ -150,4 +150,3 @@ export const pieces: pieces_type= {"Wpawn": require("./images/Wpawn.png"),
 
 
 
-
