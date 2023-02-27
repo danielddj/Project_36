@@ -3,18 +3,12 @@ import {
 } from "./graphics_handler";
 
 import { 
-    board_type, square_type, c_board   
+    board_type, square_type, c_board
 } from "./initial.config";
 
-/** Takes a list of all the pieces and the id where they are supposed to be and
- * writes them to our data structure. It is done this way to make it easier to,
- * start in different scenarios and not the normal one.
-  * @param {board_type} c_board The starting position of each piece. 
-  * @returns c_board with all the pieces in the corresponding slot.
-  */
-
-
-let turn_count = 1
+import { 
+    DOWN, DOWN_LEFT, DOWN_RIGHT, LEFT, RIGHT, UP, UP_LEFT, UP_RIGHT 
+} from "./utilites";
 
 export let in_check_w = false
 
@@ -24,15 +18,13 @@ export let Wking_slot = "35"
 
 export let Bking_slot = "5"
 
-//Riktningar att röra sig.
-const UP = -10
-const DOWN = 10
-const LEFT = -1
-const RIGHT = 1
-const UP_LEFT = -11
-const UP_RIGHT = -9
-const DOWN_LEFT = 9
-const DOWN_RIGHT = 11
+
+/** Takes a list of all the pieces and the id where they are supposed to be and
+ * writes them to our data structure. It is done this way to make it easier to,
+ * start in different scenarios and not the normal one.
+  * @param {board_type} c_board The starting position of each piece. 
+  * @returns c_board with all the pieces in the corresponding slot.
+  */
 
 
 export function intitial_game(starting_pos: board_type): board_type{
@@ -43,9 +35,34 @@ export function intitial_game(starting_pos: board_type): board_type{
       Object.keys(starting_pos).forEach(val => {
         c_board[val].piece.moves = legal_move(c_board[val])
       });
-      c_board[Wking_slot].piece.moves = c_board[Wking_slot].piece.moves.filter(id => {return !move_into_check_w().includes(id)})
-      c_board[Bking_slot].piece.moves = c_board[Bking_slot].piece.moves.filter(id => {return !move_into_check_b().includes(id)})
+      
+      move_into_check("black")
+      move_into_check("white")
       return c_board;
+}
+
+function update_king_slot(to: string, color: string): void{
+    if (color === "white") {
+        Wking_slot = to
+    } else {
+        Bking_slot = to
+    }
+}
+
+function check_check(color: string) {
+    const slot = (color: string) => {return color === "white" ? Wking_slot : Bking_slot} 
+    Object.keys(c_board).forEach(id => {
+        if (c_board[id].piece !== null && c_board[id].piece.moves.includes(slot(color))) {
+            if (color === "white") {
+                in_check_w = true
+            } else {
+                in_check_b = true
+            }
+        }
+    });
+    return color === "white" 
+           ? in_check_w
+           : in_check_b
 }
 
 /** Moves the pieces in the data structure and also calls the move_piece_graphically function
@@ -60,10 +77,10 @@ export function move_piece(to:string, from: string, c_board: board_type): board_
     c_board[from].piece = null
     move_piece_graphically(to, from)
 
-    if (c_board[to].piece.piece_name === "Wking") {
-        Wking_slot = to
-    } else if (c_board[to].piece.piece_name === "Bking") {
-        Bking_slot = to
+    if(c_board[to].piece.piece_name === "Wking") {
+        update_king_slot(to, "white")
+    } else if(c_board[to].piece.piece_name === "Bking") {
+        update_king_slot(to, "black")
     }
 
     return c_board
@@ -74,12 +91,13 @@ export function update_moves(){
         if (c_board[val].piece !== null) {
             const legal_moves = legal_move(c_board[val])
             c_board[val].piece.moves = legal_moves
-            console.log(legal_moves)
         }
       });
-      c_board[Wking_slot].piece.moves = c_board[Wking_slot].piece.moves.filter(id => {return !move_into_check_w().includes(id)})
-      c_board[Bking_slot].piece.moves = c_board[Bking_slot].piece.moves.filter(id => {return !move_into_check_b().includes(id)})
-}
+      move_into_check("black")
+      move_into_check("white")
+      check_check("white")
+      check_check("black")
+    }
 
 
 /** Changes the color of the one who is moving next.
@@ -88,7 +106,6 @@ export function update_moves(){
   */
 
 export function invert_move(color: string): string {
-    turn_count = turn_count + 1
     return (color === "white")
            ? "black" 
            : "white"             
@@ -136,42 +153,30 @@ function check_bounds_collision(target_square: number, pawn: boolean, selected_p
               : bounds_check() && collision_check()
 }
 
-export function move_into_check_w(): any {
-    let temp_board: any
-    temp_board = c_board
+export function move_into_check(color: string): any {
     let illegal_moves: Array<string> = []
-    legal_move(temp_board[Wking_slot]).forEach(target_square => {
-        temp_board[target_square].piece = temp_board[Wking_slot].piece
-        temp_board[Wking_slot].piece = null
-        Object.keys(temp_board).forEach(val => {
-            if (temp_board[val].piece !== null && legal_move(temp_board[val]).includes(target_square.toString())
-                 && temp_board[val].piece.piece_color !== "white" && !illegal_moves.includes(target_square.toString())) {
-                illegal_moves.push(target_square.toString())
-            }
-            });
-            temp_board[Wking_slot].piece = temp_board[target_square].piece
-            temp_board[target_square].piece = null
-    });
-    return illegal_moves
-}
+    const slot = (color: string) => {return color === "white" ? Wking_slot : Bking_slot} 
 
-export function move_into_check_b(): any {
-    let temp_board: any
-    temp_board = c_board
-    let illegal_moves: Array<string> = []
-    legal_move(temp_board[Bking_slot]).forEach(target_square => {
-        temp_board[target_square].piece = temp_board[Bking_slot].piece
-        temp_board[Bking_slot].piece = null
-        Object.keys(temp_board).forEach(val => {
-            if (temp_board[val].piece !== null && legal_move(temp_board[val]).includes(target_square.toString())
-                 && temp_board[val].piece.piece_color !== "black" && !illegal_moves.includes(target_square.toString())) {
-                illegal_moves.push(target_square.toString())
+    legal_move(c_board[slot(color)]).forEach(target_square => {
+        c_board[target_square].piece = c_board[slot(color)].piece
+        c_board[slot(color)].piece = null
+
+        Object.keys(c_board).forEach(val => {
+            const square = c_board[val]
+            if (square.piece !== null && square.piece.piece_color !== color && !illegal_moves.includes(target_square)
+            && legal_move(c_board[val]).includes(target_square)) {
+                illegal_moves.push(target_square)
             }
-            });
-            temp_board[Bking_slot].piece = temp_board[target_square].piece
-            temp_board[target_square].piece = null
+        });
+
+        c_board[slot(color)].piece = c_board[target_square].piece
+        c_board[target_square].piece = null
     });
-    return illegal_moves
+    
+    console.log(c_board[slot(color)])
+    if (illegal_moves !== null){
+        c_board[slot(color)].piece.moves = c_board[slot(color)].piece.moves.filter(id => {return !illegal_moves.includes(id)})
+    } else {}
 }
 
 
