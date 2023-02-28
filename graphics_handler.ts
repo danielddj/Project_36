@@ -40,6 +40,29 @@ export function move_piece_graphically(to: string, from: string): void {
     $(to).style.cursor = "pointer"
 }
 
+export function display_message(message: string) {
+    document.getElementById("message").innerHTML = message
+}
+
+export function display_current_piece(message: string) {
+    document.getElementById("Selected piece").innerHTML = message
+}
+
+export function remove_highlights(moves: Array<string>) {
+    moves.forEach(element => {
+        document.getElementById(`c${element}`).remove();
+    });
+}
+
+export function highlight_legal_moves(moves: Array<string>) {
+    moves.forEach(element => {
+        const div = document.createElement("div");
+        div.classList.add("cover")
+        div.id = `c${element}`
+        document.getElementById(element).appendChild(div); 
+    });
+}
+
 /** Makes each HTML box element the color it is supposed to be 
  * and adds a black outline  
   * @returns Void, only edits the HTML to display color.

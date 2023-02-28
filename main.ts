@@ -1,5 +1,5 @@
 import { 
-    coloring, obj_to_html  
+    coloring, display_current_piece, highlight_legal_moves, obj_to_html, remove_highlights  
 } from "./graphics_handler";
 
 import { 
@@ -7,9 +7,12 @@ import {
 } from "./utilites";
 
 import { 
-    intitial_game, invert_move, legal_move, move_piece, update_moves 
+    intitial_game, invert_move, move_piece 
 } from "./pieces_handler";
-import { starting_pos } from "./initial.config";
+
+import {
+    starting_pos 
+} from "./initial.config";
 
 
 let current_click = {"piece_selected": false, "piece":"", "id": ""}
@@ -29,14 +32,14 @@ $$(".box").forEach((box: any) => {
         if (current_click.piece_selected) {
             if (current_click.id === box.id){
                 current_click = deselect_piece
-                console.log(current_click)   
+                display_current_piece("") 
+                remove_highlights(c_board[box.id].piece.moves)   
             } else {
                 if(c_board[current_click.id].piece.moves.includes(box.id)){
+                    remove_highlights(c_board[current_click.id].piece.moves)
                     move_piece(box.id, current_click.id, c_board)
                     whos_turn = invert_move(whos_turn)
-                    console.log(whos_turn) 
                     current_click = deselect_piece
-                    update_moves()
                 } else {
                     console.log("Illegal move!")
             }
@@ -44,7 +47,8 @@ $$(".box").forEach((box: any) => {
         } else {
             if (c_board[box.id].piece !== null && whos_turn === c_board[box.id].piece.piece_color){
                 current_click = {"piece_selected": true, "piece": c_board[`${box.id}`].piece.piece_name, "id": `${box.id}`}
-                console.log(current_click) 
+                highlight_legal_moves(c_board[box.id].piece.moves)
+                display_current_piece(`${current_click.piece} - Square: ${box.id}`) 
             } else {
                 return (c_board[box.id].piece === null)
                        ? console.log("Please select a piece")
@@ -59,3 +63,4 @@ let c_board = intitial_game(starting_pos)
 obj_to_html(c_board)
 
 coloring();
+
