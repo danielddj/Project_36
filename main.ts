@@ -19,6 +19,11 @@ let current_click = {"piece_selected": false, "piece":"", "id": ""}
 
 let whos_turn = "white"
 
+let c_board = intitial_game(starting_pos)
+
+obj_to_html(c_board)
+
+coloring();
 
 
 /** Is not relly a function, adds event listeners to each HTMLElement called box (square) 
@@ -37,7 +42,7 @@ $$(".box").forEach((box: any) => {
             } else {
                 if(c_board[current_click.id].piece.moves.includes(box.id)){
                     remove_highlights(c_board[current_click.id].piece.moves)
-                    move_piece(box.id, current_click.id, c_board)
+                    move_piece(box.id, current_click.id)
                     whos_turn = invert_move(whos_turn)
                     current_click = deselect_piece
                 } else {
@@ -58,9 +63,4 @@ $$(".box").forEach((box: any) => {
     })
 })
 
-let c_board = intitial_game(starting_pos)
-
-obj_to_html(c_board)
-
-coloring();
 

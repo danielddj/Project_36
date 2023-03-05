@@ -54,24 +54,24 @@ function update_king_slot(to: string, color: string): void{
   * @returns c_board, the updated data structure.
   */
 
-export function move_piece(to:string, from: string, c_board: board_type): board_type{   
+export function move_piece(to:string, from: string): void{   
     if ((c_board[from].piece.piece_name === "Wking" || c_board[from].piece.piece_name === "Bking") && 
         (from === "5" || from === "75") && (to === "1" || to === "8" || to === "78" || to === "71")) {
         if (to === "78"){
-            move_piece("77", "75", c_board)
-            move_piece("76", "78", c_board)
+            move_piece("77", "75")
+            move_piece("76", "78")
         }
         if (to === "71") {
-            move_piece("73", "75", c_board)
-            move_piece("74", "71", c_board) 
+            move_piece("73", "75")
+            move_piece("74", "71") 
         }
         if (to === "1"){
-            move_piece("4", "1", c_board)
-            move_piece("3", "5", c_board)
+            move_piece("4", "1")
+            move_piece("3", "5")
         }  
         if (to === "8" ){  
-            move_piece("7", "5", c_board)
-            move_piece("6", "8", c_board)
+            move_piece("7", "5")
+            move_piece("6", "8")
         }  
     } else {
         c_board[to].piece = c_board[from].piece
@@ -86,7 +86,6 @@ export function move_piece(to:string, from: string, c_board: board_type): board_
         }
     }
     update_moves()
-    return c_board
 }
 
 function remove_all_moves(color: string) {
@@ -145,7 +144,6 @@ function update_moves(){
             c_board[val].piece.moves = legal_moves
         }
     });
-    move_into_check()
     check_check()
     is_game_over()
 }
@@ -301,36 +299,6 @@ function check_check() {
         : slot().under_check});
 }
 
-function move_into_check(): any {
-    ["black", "white"].forEach(color => {  
-        let illegal_moves: Array<string> = []
-        const slot = () => {return color === "black" ? king_tracker.Bking.id : king_tracker.Wking.id} 
-
-        c_board[slot()].piece.moves.forEach(target_square => {
-            let cloned_array: board_type = JSON.parse(JSON.stringify(c_board));
-            cloned_array[target_square].piece = cloned_array[slot()].piece
-            cloned_array[slot()].piece = null
-
-            Object.keys(cloned_array).forEach(val => {
-                if (cloned_array[val].piece !== null) {
-                    const legal_moves = legal_move(cloned_array[val], cloned_array)
-                    cloned_array[val].piece.moves = legal_moves
-                }
-            });
-
-            Object.keys(cloned_array).forEach(val => {
-                const square = cloned_array[val]
-                if (square.piece !== null && square.piece.piece_color !== color && cloned_array[val].piece.moves.includes(target_square)) {
-                    illegal_moves.push(target_square)
-                }
-            });
-        });
-        
-        if (illegal_moves !== null){
-            c_board[slot()].piece.moves = c_board[slot()].piece.moves.filter(id => {return !illegal_moves.includes(id)})
-        } else {}
-    });
-}
 
 function check_move_out(color: string): boolean {
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking}
@@ -424,7 +392,8 @@ function collosion_check_castling(color: string, direction: string) {
 }
 
 // Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
-export function legal_move(selected_piece: square_type, board: board_type): Array<string> {                                                                           
+export function legal_move (selected_piece: square_type, board: board_type) {
+function legal_move_square(selected_piece: square_type, board: board_type): Array<string> {                                                                           
     let current_square: number = parseInt(selected_piece.id)                           
     let legal_moves: Array<string> = []
     let working_square: number 
@@ -877,4 +846,38 @@ export function legal_move(selected_piece: square_type, board: board_type): Arra
     
     return legal_moves
     
+}
+
+    function move_into_check(legal_moves: Array<string>): any {     
+            let illegal_moves: Array<string> = []
+            const slot = () => {return selected_piece.piece.piece_color === "black" ? king_tracker.Bking : king_tracker.Wking} 
+
+            legal_move_square(selected_piece, c_board).forEach(target_square => {
+                let cloned_array: board_type = JSON.parse(JSON.stringify(c_board));
+                cloned_array[target_square].piece = selected_piece.piece
+                cloned_array[selected_piece.id].piece = null
+
+                Object.keys(cloned_array).forEach(val => {
+                    if (cloned_array[val].piece !== null) {
+                        const legal_moves = legal_move_square(cloned_array[val], cloned_array)
+                        cloned_array[val].piece.moves = legal_moves
+                    }
+                });
+
+                Object.keys(cloned_array).forEach(val => {
+                    const square = cloned_array[val]
+                    if (square.piece !== null && square.piece.piece_color !== selected_piece.piece.piece_color && (selected_piece.piece.piece_name === "Wking" ||
+                        selected_piece.piece.piece_name === "Bking") && cloned_array[val].piece.moves.includes(target_square)) {
+                        illegal_moves.push(target_square)
+                    }
+                    else if (square.piece !== null && square.piece.piece_color !== selected_piece.piece.piece_color && (cloned_array[val].piece.moves.includes(slot().id) )) {
+                        illegal_moves.push(target_square)
+                    }
+                });
+            });
+            return legal_moves.filter(foo => !illegal_moves.includes(foo))
+    }
+
+    return move_into_check(legal_move_square(selected_piece, board))
+
 }
