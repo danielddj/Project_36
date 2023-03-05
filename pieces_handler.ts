@@ -88,7 +88,7 @@ export function move_piece(to:string, from: string): void{
     update_moves()
 }
 
-function remove_all_moves(color: string) {
+function remove_moves(color: string) {
     Object.keys(c_board).forEach(val => {
         if (c_board[val].piece !== null) {
             if (c_board[val].piece.piece_name === "Wking" || c_board[val].piece.piece_name === "Bking"){
@@ -102,31 +102,6 @@ function remove_all_moves(color: string) {
             }
         }
     });
-}
-
-function is_game_over(){
-    if(king_tracker.Wking.under_check || king_tracker.Bking.under_check){
-        if(king_tracker.Wking.under_check) {
-            if (check_move_out("white")){
-                    remove_all_moves("white")
-                    display_message("Under check!")
-                } else {
-                    remove_all_moves("white")
-                    display_message("Black won!")
-                }
-            } else {
-                if (check_move_out("black")){
-                    remove_all_moves("black")
-                    display_message("Under check!")
-                } else {
-                    remove_all_moves("black")
-                    display_message("White won!")
-                }
-
-        } 
-        } else {
-            display_message("")
-    } 
 }
 
 /** Updates the legal moves for each piece when it is called
@@ -145,7 +120,14 @@ function update_moves(){
         }
     });
     check_check()
-    is_game_over()
+
+    if (king_tracker.Wking.under_check) {
+        check_move_out("white")
+    } else if (king_tracker.Bking.under_check) {
+        check_move_out("black")
+    } else {
+        display_message("")
+    }
 }
 
 /** Changes the color of the one who is moving next.
@@ -300,15 +282,18 @@ function check_check() {
 }
 
 
-function check_move_out(color: string): boolean {
+function check_move_out(color: string): void {
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking}
 
     if (c_board[slot().id].piece.moves.length !== 0) {
-        return true 
+        remove_moves(color)
+        display_message("Under check")
     } else if (Object.keys(can_block_check(color)).length !== 0) {
-        return true
+        remove_moves(color)
+        display_message("Under check")
     } else {
-        return false
+        remove_moves(color)
+        display_message(`${invert_move(color)} won!`)
     }
 }
 
