@@ -11,7 +11,6 @@ export interface piece {
     piece_name: string
     piece_color: string
     moves: Array<string>
-    pawn_moves?: Array<string>
     times_moved: number
 }
 
@@ -25,14 +24,14 @@ export const starting_pos: board_type = {"1": {piece: {piece_name: "Brook", piec
                                     "6": {piece: {piece_name: "Bbishop", piece_color: "black", moves: [], times_moved: 0}, id: "6"}, 
                                     "7": {piece: {piece_name: "Bknight", piece_color: "black", moves: [], times_moved: 0}, id: "7"}, 
                                     "8": {piece: {piece_name: "Brook", piece_color: "black", moves: [], times_moved: 0}, id: "8"}, 
-                                    "11": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves:[]}, id: "11"}, 
-                                    "12": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves: []}, id: "12"}, 
-                                    "13": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves: []}, id: "13"}, 
-                                    "14": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves: []}, id: "14"}, 
-                                    "15": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves: []}, id: "15"}, 
-                                    "16": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves: []}, id: "16"}, 
-                                    "17": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves: []}, id: "17"}, 
-                                    "18": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0, pawn_moves: []}, id: "18"}, 
+                                    "11": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "11"}, 
+                                    "12": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "12"}, 
+                                    "13": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "13"}, 
+                                    "14": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "14"}, 
+                                    "15": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "15"}, 
+                                    "16": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "16"}, 
+                                    "17": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "17"}, 
+                                    "18": {piece: {piece_name: "Bpawn", piece_color: "black", moves: [], times_moved: 0}, id: "18"}, 
                                     "71": {piece: {piece_name: "Wrook", piece_color: "white", moves: [], times_moved: 0,}, id: "71"}, 
                                     "72": {piece: {piece_name: "Wknight", piece_color: "white", moves: [], times_moved: 0,}, id: "72"}, 
                                     "73": {piece: {piece_name: "Wbishop", piece_color: "white", moves: [], times_moved: 0,}, id: "73"}, 
@@ -41,14 +40,14 @@ export const starting_pos: board_type = {"1": {piece: {piece_name: "Brook", piec
                                     "76": {piece: {piece_name: "Wbishop", piece_color: "white", moves: [], times_moved: 0,}, id: "76"}, 
                                     "77": {piece: {piece_name: "Wknight", piece_color: "white", moves: [], times_moved: 0,}, id: "77"}, 
                                     "78": {piece: {piece_name: "Wrook", piece_color: "white", moves: [], times_moved: 0,}, id: "78"},
-                                    "61": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "61"}, 
-                                    "62": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "62"}, 
-                                    "63": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "63"}, 
-                                    "64": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "64"}, 
-                                    "65": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "65"}, 
-                                    "66": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "66"}, 
-                                    "67": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "67"}, 
-                                    "68": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0, pawn_moves: []}, id: "68"},}
+                                    "61": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "61"}, 
+                                    "62": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "62"}, 
+                                    "63": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "63"}, 
+                                    "64": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "64"}, 
+                                    "65": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "65"}, 
+                                    "66": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "66"}, 
+                                    "67": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "67"}, 
+                                    "68": {piece: {piece_name: "Wpawn", piece_color: "white", moves: [], times_moved: 0}, id: "68"},}
 
 export const board_color: Array<string> = ["w", "b", "w", "b", "w", "b", "w", "b",
                                     "b", "w", "b", "w", "b", "w", "b", "w",

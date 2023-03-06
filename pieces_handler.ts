@@ -4,7 +4,7 @@ import {
 } from "./graphics_handler";
 
 import { 
-    board_type, square_type, c_board, king_tracker
+    board_type, square_type, c_board, king_tracker, piece
 } from "./initial.config";
 
 import { 
@@ -22,11 +22,11 @@ import {
 export function intitial_game(starting_pos: board_type): board_type{
     Object.keys(starting_pos).forEach(val => {
         c_board[val].piece = starting_pos[val].piece;
-        c_board[val].piece.piece_color = starting_pos[val].piece.piece_color;
+        (c_board[val].piece as piece).piece_color = (starting_pos[val].piece as piece).piece_color;
     });
 
     Object.keys(starting_pos).forEach(val => {
-        c_board[val].piece.moves = legal_move(c_board[val], c_board);
+        (c_board[val].piece as piece).moves = legal_move(c_board[val], c_board);
     });
 
     return c_board;
@@ -55,7 +55,7 @@ function update_king_slot(to: string, color: string): void{
   */
 
 export function move_piece(to:string, from: string): void{   
-    if ((c_board[from].piece.piece_name === "Wking" || c_board[from].piece.piece_name === "Bking") && 
+    if (((c_board[from].piece as piece).piece_name === "Wking" || (c_board[from].piece as piece).piece_name === "Bking") && 
         (from === "5" || from === "75") && (to === "1" || to === "8" || to === "78" || to === "71")) {
         if (to === "78"){
             move_piece("77", "75");
@@ -77,11 +77,11 @@ export function move_piece(to:string, from: string): void{
         c_board[to].piece = c_board[from].piece;
         c_board[from].piece = null;
         move_piece_graphically(to, from);
-        c_board[to].piece.times_moved = c_board[to].piece.times_moved + 1;
+        (c_board[to].piece as piece).times_moved = (c_board[to].piece as piece).times_moved + 1;
 
-        if(c_board[to].piece.piece_name === "Wking") {
+        if((c_board[to].piece as piece).piece_name === "Wking") {
             update_king_slot(to, "white");
-        } else if(c_board[to].piece.piece_name === "Bking") {
+        } else if((c_board[to].piece as piece).piece_name === "Bking") {
             update_king_slot(to, "black");
         }
     }
@@ -97,11 +97,11 @@ export function move_piece(to:string, from: string): void{
   * @returns void, only assignment 
   */
 
-function update_moves(){
+function update_moves() {
     Object.keys(c_board).forEach(val => {
         if (c_board[val].piece !== null) {
             const legal_moves = legal_move(c_board[val], c_board);
-            c_board[val].piece.moves = legal_moves;
+            (c_board[val].piece as piece).moves = legal_moves;
         }
     });
     check_check();
@@ -122,10 +122,10 @@ function update_moves(){
 
 export function invert_move(color: string): string {
     if (color === "white"){
-        document.getElementById("turn").innerHTML = "Blacks turn";
+        (document.getElementById("turn") as HTMLElement).innerHTML = "Blacks turn";
         return "black";
     } else { 
-        document.getElementById("turn").innerHTML = "Whites turn";
+        (document.getElementById("turn") as HTMLElement).innerHTML = "Whites turn";
         return "white";
      }             
 }
@@ -162,7 +162,7 @@ function in_checking_dir(color: string, id: number) {
     const dir = checking_direction(slot().id, color);
     
     if (dir === LEFT) {
-        slot().checking_piece.piece.moves.forEach(val => {
+        (slot().checking_piece.piece as piece).moves.forEach(val => {
             const val_as_int = parseInt(first_char(val) as string);
             if (val_as_int === first_char(id) && val_as_int - id < 0) {
                 disrupt_moves.push(val);
@@ -171,7 +171,7 @@ function in_checking_dir(color: string, id: number) {
     }
         
     if (dir === RIGHT) {
-        slot().checking_piece.piece.moves.forEach(val => {
+        (slot().checking_piece.piece as piece).moves.forEach(val => {
             const val_as_int = parseInt(first_char(val) as string);
             if (val_as_int === first_char(id) && val_as_int - id > 0) {
                 disrupt_moves.push(val);    
@@ -180,7 +180,7 @@ function in_checking_dir(color: string, id: number) {
     }
 
     if (dir === DOWN) {
-        slot().checking_piece.piece.moves.forEach(val => {
+        (slot().checking_piece.piece as piece).moves.forEach(val => {
             const val_as_int = parseInt(first_char(val) as string);
             if (second_char(val_as_int) === second_char(id) && val_as_int - id < 0) {
                 disrupt_moves.push(val);    
@@ -189,7 +189,7 @@ function in_checking_dir(color: string, id: number) {
     }
         
     if (dir === DOWN) {
-        slot().checking_piece.piece.moves.forEach(val => {
+        (slot().checking_piece.piece as piece).moves.forEach(val => {
             const val_as_int = parseInt(first_char(val) as string);
             if (second_char(val_as_int) === second_char(id) && val_as_int - id > 0) {
                 disrupt_moves.push(val);    
@@ -240,7 +240,7 @@ function check_check() {
     ["white", "black"].forEach(color => {    
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking}; 
     Object.keys(c_board).every(id => {
-        if (c_board[id].piece !== null && c_board[id].piece.moves.includes(slot().id)) {
+        if (c_board[id].piece !== null && (c_board[id].piece as piece).moves.includes(slot().id)) {
             if (color === "white"){
                 update_check(id, color, false);
                 return false;
@@ -265,7 +265,7 @@ function check_check() {
 function check_move_out(color: string): void {
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking};
 
-    if (c_board[slot().id].piece.moves.length !== 0) {
+    if ((c_board[slot().id].piece as piece).moves.length !== 0) {
         display_message("Under check");
     } else if (Object.keys(can_block_check(color)).length !== 0) {
         display_message("Under check");
@@ -279,11 +279,11 @@ function can_block_check(color: string) {
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking};
     const disrupt_moves: {[key: string]: any} = {};
     Object.keys(c_board).forEach(id => {
-        if (c_board[id].piece !== null && slot().checking_piece.piece.piece_color !== c_board[id].piece.piece_color 
-            && (c_board[id].piece.moves.some(r => in_checking_dir(color, parseInt(slot().checking_piece.id)).includes(r)) 
-            || c_board[id].piece.moves.includes(slot().checking_piece.id))) {
-                disrupt_moves[id] = ((c_board[id].piece.moves.filter(id => {return id === slot().checking_piece.id 
-                                    || in_checking_dir(color, parseInt(slot().checking_piece.id)).includes(id)})));
+        if (c_board[id].piece !== null && (slot().checking_piece.piece as piece).piece_color !== (c_board[id].piece as piece).piece_color 
+            && ((c_board[id].piece as piece).moves.some(r => in_checking_dir(color, parseInt((slot().checking_piece.id as string))).includes(r)) 
+            || (c_board[id].piece as piece).moves.includes(slot().checking_piece.id as string))) {
+                disrupt_moves[id] = (((c_board[id].piece as piece).moves.filter(id => {return id === slot().checking_piece.id as string 
+                                    || in_checking_dir(color, parseInt(slot().checking_piece.id as string)).includes(id)})));
         }
     });
     return disrupt_moves;
@@ -301,7 +301,7 @@ function check_bounds_collision(target_square: number, pawn: boolean, selected_p
     // Hjälpfunktion som kollar om en pjäs möter en annan pjäs.
     function collision_check(): boolean {
             if ((board[target_square].piece !== null)){
-                if (selected_piece.piece.piece_color !== board[target_square].piece.piece_color && first_collision){
+                if ((selected_piece.piece as piece).piece_color !== (board[target_square].piece as piece).piece_color && first_collision){
                     first_collision = false;
                     return true;
                 } else{
@@ -318,7 +318,7 @@ function check_bounds_collision(target_square: number, pawn: boolean, selected_p
             if (board[target_square].piece === null) {
                 return false;
             } else {
-                return (selected_piece.piece.piece_color === board[target_square].piece.piece_color)
+                return ((selected_piece.piece as piece).piece_color === (board[target_square].piece as piece).piece_color)
                     ? false
                     : true;
             }
@@ -369,70 +369,57 @@ export function legal_move (selected_piece: square_type, board: board_type) {
         const push = (target_square: number) => {legal_moves.push(target_square.toString())};
                                                     
         
-        switch (selected_piece.piece.piece_name) {
+        switch ((selected_piece.piece as piece).piece_name) {
 
             case "Wpawn":
-                selected_piece.piece.pawn_moves = [];
                 target_square = current_square + UP;
                 if (board[target_square].piece === null ){
                     push(target_square);
                 }
                 
-                if (selected_piece.piece.times_moved === 0 && board[current_square + (UP * 2)].piece === null
+                if ((selected_piece.piece as piece).times_moved === 0 && board[current_square + (UP * 2)].piece === null
                     && c_board[(current_square - 10).toString()].piece === null){
                         push(current_square + (UP * 2));     
                 }
 
                 target_square = current_square + UP_LEFT;
                 first_collision = true;
-                if (check_bounds_collision(target_square, false, selected_piece, board)) {
-                    selected_piece.piece.pawn_moves.push(target_square.toString());
                     if (check_bounds_collision(target_square, true, selected_piece, board)) {
                         push(target_square);
                     }
-                }
 
                 target_square = current_square + UP_RIGHT;
                 first_collision = true;
-                if (check_bounds_collision(target_square, false, selected_piece, board)) {
-                    selected_piece.piece.pawn_moves.push(target_square.toString());
                     if (check_bounds_collision(target_square, true, selected_piece, board)) {
                         push(target_square);
                     }
-                }
 
                 break; 
 
             
             case "Bpawn":
-                selected_piece.piece.pawn_moves = [];
                 target_square = current_square + DOWN;
                 if (board[target_square].piece === null) {
                     push(target_square);
                 }
 
-                if (selected_piece.piece.times_moved === 0 && board[current_square + (DOWN * 2)].piece === null 
+                if ((selected_piece.piece as piece).times_moved === 0 && board[current_square + (DOWN * 2)].piece === null 
                     && c_board[(current_square + 10).toString()].piece === null){
                         push(current_square + (DOWN * 2));
                 }
                 
                 target_square = current_square + DOWN_LEFT;
                 first_collision = true;
-                if (check_bounds_collision(target_square, false, selected_piece, board)) {
-                    selected_piece.piece.pawn_moves.push(target_square.toString());
                     if (check_bounds_collision(target_square, true, selected_piece, board)) {
                         push(target_square);
                     }
-                }
+                
 
                 target_square = current_square + DOWN_RIGHT;
                 first_collision = true;
-                if (check_bounds_collision(target_square, false, selected_piece, board)) {
-                    selected_piece.piece.pawn_moves.push(target_square.toString());
                     if (check_bounds_collision(target_square, true, selected_piece, board)) {
                         push(target_square);
                     }
-                }
                     
                 break; 
 
@@ -463,11 +450,11 @@ export function legal_move (selected_piece: square_type, board: board_type) {
                 target_square = current_square + DOWN_RIGHT;  
                 add_move(target_square);
 
-                if (selected_piece.piece.times_moved === 0 && c_board["78"].piece !== null && c_board["78"].piece.times_moved === 0 && collosion_check_castling("white", "right")){
+                if ((selected_piece.piece as piece).times_moved === 0 && c_board["78"].piece !== null && c_board["78"].piece.times_moved === 0 && collosion_check_castling("white", "right")){
                     push(78);
                 }
 
-                if (selected_piece.piece.times_moved === 0 && c_board["71"].piece !== null && c_board["71"].piece.times_moved === 0 && collosion_check_castling("white", "left")){
+                if ((selected_piece.piece as piece).times_moved === 0 && c_board["71"].piece !== null && c_board["71"].piece.times_moved === 0 && collosion_check_castling("white", "left")){
                     push(71);
                 }
 
@@ -498,11 +485,11 @@ export function legal_move (selected_piece: square_type, board: board_type) {
                 target_square = current_square + DOWN_RIGHT
                 add_move(target_square);
 
-                if (selected_piece.piece.times_moved === 0 && c_board["8"].piece !== null && c_board["8"].piece.times_moved === 0 && collosion_check_castling("black", "right")){
+                if ((selected_piece.piece as piece).times_moved === 0 && c_board["8"].piece !== null && c_board["8"].piece.times_moved === 0 && collosion_check_castling("black", "right")){
                     push(8);
                 }
 
-                if (selected_piece.piece.times_moved === 0 && c_board["1"].piece !== null && c_board["1"].piece.times_moved === 0 && collosion_check_castling("black", "left")){
+                if ((selected_piece.piece as piece).times_moved === 0 && c_board["1"].piece !== null && c_board["1"].piece.times_moved === 0 && collosion_check_castling("black", "left")){
                     push(1);
                 }
 
@@ -815,7 +802,7 @@ export function legal_move (selected_piece: square_type, board: board_type) {
 
     function move_into_check(legal_moves: Array<string>): any {     
             let illegal_moves: Array<string> = [];
-            const slot = () => {return selected_piece.piece.piece_color === "black" ? king_tracker.Bking : king_tracker.Wking}; 
+            const slot = () => {return (selected_piece.piece as piece).piece_color === "black" ? king_tracker.Bking : king_tracker.Wking}; 
 
             legal_move_square(selected_piece, c_board).forEach(target_square => {
                 let cloned_array: board_type = JSON.parse(JSON.stringify(c_board));
@@ -825,19 +812,21 @@ export function legal_move (selected_piece: square_type, board: board_type) {
                 Object.keys(cloned_array).forEach(val => {
                     if (cloned_array[val].piece !== null) {
                         const legal_moves = legal_move_square(cloned_array[val], cloned_array);
-                        cloned_array[val].piece.moves = legal_moves;
+                        (cloned_array[val].piece as piece).moves = legal_moves;
                     }
                 });
 
                 Object.keys(cloned_array).forEach(val => {
                     const square = cloned_array[val];
-                    if (square.piece !== null && square.piece.piece_color !== selected_piece.piece.piece_color && (selected_piece.piece.piece_name === "Wking" ||
-                        selected_piece.piece.piece_name === "Bking") && cloned_array[val].piece.moves.includes(target_square)) {
+                    if (square.piece !== null && (square.piece as piece).piece_color !== (selected_piece.piece as piece).piece_color 
+                    && ((selected_piece.piece as piece).piece_name === "Wking" || (selected_piece.piece as piece).piece_name === "Bking") 
+                    && (cloned_array[val].piece as piece).moves.includes(target_square)) {
                         illegal_moves.push(target_square);
                     }
-                    else if (square.piece !== null && !(selected_piece.piece.piece_name === "Wking" 
-                            ||selected_piece.piece.piece_name === "Bking") && square.piece.piece_color !== selected_piece.piece.piece_color 
-                            && (cloned_array[val].piece.moves.includes(slot().id))) {
+                    else if (square.piece !== null && !((selected_piece.piece as piece).piece_name === "Wking" 
+                            || (selected_piece.piece as piece).piece_name === "Bking") 
+                            && (square.piece as piece).piece_color !== (selected_piece.piece as piece).piece_color 
+                            && ((cloned_array[val].piece as piece).moves.includes(slot().id))) {
                         illegal_moves.push(target_square);
                     }
                 });

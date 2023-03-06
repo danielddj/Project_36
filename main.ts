@@ -11,17 +11,18 @@ import {
 } from "./pieces_handler";
 
 import {
+    piece,
     starting_pos 
 } from "./initial.config";
 
 
-let current_click = {"piece_selected": false, "piece":"", "id": ""}
+let current_click = {"piece_selected": false, "piece":"", "id": ""};
 
-let whos_turn = "white"
+let whos_turn = "white";
 
-let c_board = intitial_game(starting_pos)
+let c_board = intitial_game(starting_pos);
 
-obj_to_html(c_board)
+obj_to_html(c_board);
 
 coloring();
 
@@ -33,31 +34,31 @@ coloring();
 
 $$(".box").forEach((box: any) => {
     box.addEventListener('click', function(){
-        console.log(c_board[box.id].piece)
+        console.log(c_board[box.id].piece);
         if (current_click.piece_selected) {
             if (current_click.id === box.id){
-                current_click = deselect_piece
-                display_current_piece("") 
-                remove_highlights(c_board[box.id].piece.moves)   
+                current_click = deselect_piece;
+                display_current_piece("");
+                remove_highlights((c_board[box.id].piece as piece).moves);   
             } else {
-                if(c_board[current_click.id].piece.moves.includes(box.id)){
-                    remove_highlights(c_board[current_click.id].piece.moves)
-                    move_piece(box.id, current_click.id)
-                    whos_turn = invert_move(whos_turn)
-                    current_click = deselect_piece
+                if((c_board[current_click.id].piece as piece).moves.includes(box.id)){
+                    remove_highlights((c_board[current_click.id].piece as piece).moves);
+                    move_piece(box.id, current_click.id);
+                    whos_turn = invert_move(whos_turn);
+                    current_click = deselect_piece;
                 } else {
-                    console.log("Illegal move!")
+                    console.log("Illegal move!");
             }
         }
         } else {
-            if (c_board[box.id].piece !== null && whos_turn === c_board[box.id].piece.piece_color){
-                current_click = {"piece_selected": true, "piece": c_board[`${box.id}`].piece.piece_name, "id": `${box.id}`}
-                highlight_legal_moves(c_board[box.id].piece.moves)
-                display_current_piece(`${current_click.piece} - Square: ${box.id}`) 
+            if (c_board[box.id].piece !== null && whos_turn === (c_board[box.id].piece as piece).piece_color){
+                current_click = {"piece_selected": true, "piece": (c_board[`${box.id}`].piece as piece).piece_name, "id": `${box.id}`}
+                highlight_legal_moves((c_board[current_click.id].piece as piece).moves);
+                display_current_piece(`${current_click.piece} - Square: ${box.id}`);
             } else {
                 return (c_board[box.id].piece === null)
                        ? console.log("Please select a piece")
-                       : console.log("It is not your turn!")
+                       : console.log("It is not your turn!");
             }
         }
     })
