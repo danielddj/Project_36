@@ -8,8 +8,9 @@ import {
     board_color, board_type, piece, pieces,   
 } from "./initial.config";
 
-/** Takes our back end representation of the chess board and displays it on the screen  
-  * @param c_board The chess board to display in html. 
+/** Takes our back end representation of the chess board and displays it on the screen
+ * @precondition The input board must be of standard 8x8 configuration  
+  * @param {board_type} c_board The chess board to display in html. 
   * @returns Void, only edits the HTML to display pieces.
   */
 
@@ -28,7 +29,8 @@ export function obj_to_html(c_board: board_type): void {
     });
 }
 
-/** Moves a piece grapically on the screen  
+/** Moves a piece grapically on the screen
+ * @precondition c_board[from] must contain a piece  
   * @param {string} to The ID of the square where the piece is moving to.
   * @param {string} from The ID of the square where the piece is moving from. 
   * @returns Void, only edits the HTML to display pieces.
@@ -41,21 +43,40 @@ export function move_piece_graphically(to: string, from: string): void {
     $(to).style.cursor = "pointer";
 }
 
-export function display_message(message: string) {
+
+/** Displays message to the left of the board  
+  * @param {string} message The message to be displayed.
+  * @returns Void, only edits the HTML to display message.
+  */
+export function display_message(message: string): void {
     (document.getElementById("message") as HTMLElement).innerHTML = message;
 }
 
-export function display_current_piece(message: string) {
+/** Displays a message to the left of the board  
+  * @param {string} message The message to be displayed.
+  * @returns Void, only edits the HTML to display message.
+  */
+export function display_current_piece(message: string): void {
     (document.getElementById("message") as HTMLElement).innerHTML = message;
 }
 
-export function remove_highlights(moves: Array<string>) {
+/** Removes the green highlights where a piece can move
+ * @precondition The squares in the moves array must be higlighted in green  
+  * @param {Array<string>} moves The green squares to be removed.
+  * @returns Void, only edits the HTML to display message.
+  */
+export function remove_highlights(moves: Array<string>): void {
     moves.forEach(element => {
         (document.getElementById(`c${element}`) as HTMLElement).remove();
     });
 }
 
-export function highlight_legal_moves(moves: Array<string>) {
+/** Adds the green highlights where a piece can move  
+ * * @precondition The squares in the moves array must not be higlighted beforhand. 
+  * @param {Array<string>} moves The green squares to be displayed.
+  * @returns Void, only edits the HTML to display message.
+  */
+export function highlight_legal_moves(moves: Array<string>): void {
     moves.forEach(element => {
         const div = document.createElement("div");
         div.classList.add("cover");

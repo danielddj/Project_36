@@ -1,6 +1,5 @@
 import { 
-    display_message,
-    move_piece_graphically 
+    display_message, move_piece_graphically 
 } from "./graphics_handler";
 
 import { 
@@ -14,10 +13,11 @@ import {
 /** Takes a list of all the pieces and the id where they are supposed to be and
  * writes them to our data structure. It is done this way to make it easier to,
  * start in different scenarios and not the normal one.
+ * @precondition That the wanted starting position is a non empty object of
+ * board_type and all the pieces in starting_pos is with in the 8x8 board
   * @param {board_type} c_board The starting position of each piece. 
   * @returns c_board with all the pieces in the corresponding slot.
   */
-
 
 export function intitial_game(starting_pos: board_type): board_type{
     Object.keys(starting_pos).forEach(val => {
@@ -33,8 +33,11 @@ export function intitial_game(starting_pos: board_type): board_type{
 }
 
 /** Updates the variable Wking_slot and Bking_slot, after the king has moved
-  * @param {to} string The position the king is moving to. 
+ * @precondition Color is either "white" or "black" and to is an existing square
+ * on the board
+ * @param {to} string The position the king is moving to. 
   * @param {from} string The position the king is moving from.
+  * @example update_king_slot(2, 3) Changes the id stored in kingtracker from "3" to "2"
   * @returns void, only assignment 
   */
 
@@ -48,10 +51,13 @@ function update_king_slot(to: string, color: string): void{
 
 
 /** Moves the pieces in the data structure and also calls the move_piece_graphically function
+ * @precondition To and from must be existing squares, and c_board[from] must have a piece in it.
   * @param {string} to The ID of the square where the piece is moving to.
   * @param {string} from The ID of the square where the piece is moving from.
   * @param {board_type} c_board The data structure. 
-  * @returns c_board, the updated data structure.
+  * @example move_piece(3, 2) changes the position of the piece stored in two to three,
+  * and then deletes the piece from square 2
+  * @returns Void only assignment
   */
 
 export function move_piece(to:string, from: string): void{   
@@ -90,14 +96,13 @@ export function move_piece(to:string, from: string): void{
 
 
 /** Updates the legal moves for each piece when it is called
- * also check if the king is in check position, and removes
- * moves
-  * @param {to} string The position the king is moving to. 
-  * @param {from} string The position the king is moving from.
+ * also check if the king is in check position, if this is the
+ * case it checks if it is check mate.
+ * @precondition Non
   * @returns void, only assignment 
   */
 
-function update_moves() {
+function update_moves(): void{
     Object.keys(c_board).forEach(val => {
         if (c_board[val].piece !== null) {
             const legal_moves = legal_move(c_board[val], c_board);
@@ -116,7 +121,9 @@ function update_moves() {
 }
 
 /** Changes the color of the one who is moving next.
+ * @precondition Color is either "white" or "black"
   * @param {string} color The color of the one who did the move
+  * @example returns white, when called with black.
   * @returns The color of the one who is moving next
   */
 
@@ -130,7 +137,17 @@ export function invert_move(color: string): string {
      }             
 }
 
-function checking_direction(checking_square: string, color: string) {
+/** Calculates where the king is in reference to the piece that is checking it
+ * @precondition Color is either "white" or "black", and there exist a piece located at id and it
+ * is putting the king under check
+  * @param {string} checking_square The square of the piece putting the king under check
+  * @param {string} color The color of the king under check
+  * @example When white king is located at square 1, and the threatening piece a rook at square 5
+  * eg. checking_direction(5, "white") it returns Left and left corresponds to -1  
+  * @returns The number corresponding to the directon of the check
+  */
+
+function checking_direction(checking_square: string, color: string): number {
     const slot = (color: string) => {return color === "white" ? king_tracker.Wking.id : king_tracker.Bking.id};
     const king_square_int = parseInt(slot(color));
     const checking_square_int = parseInt(checking_square);
@@ -155,6 +172,17 @@ function checking_direction(checking_square: string, color: string) {
             : UP_LEFT;
         }  
 }
+
+/** Calculates the squares that if moved to interupts a check. As an example the squares inbetween
+ * a king and a rook of the oposite color
+ * @precondition Color is either "white" or "black", and there exist a piece located at id and it
+ * is putting the king under check
+  * @param {string} id The square of the piece putting the king under check
+  * @param {string} color The color of the king under check
+  * @example When white king is located at square 1, and the threatening piece a rook at square 5
+  * eg. in_checking_dir(5, "white") it returns ["5", "4", "3", "2"] 
+  * @returns Array with all the squares that when moved to interups the check
+  */
 
 function in_checking_dir(color: string, id: number) {
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking};
@@ -223,7 +251,16 @@ function in_checking_dir(color: string, id: number) {
         return disrupt_moves;     
 }
 
-function update_check(id: string, color: string, remove: boolean){
+/** Updates the king_tracker to add or remove a piece checking the king
+ * @precondition Color is either "white" or "black", and there exist a piece at id
+  * @param {string} id The square of the piece putting the king under check
+  * @param {string} color The color of the witch king_tracker that is being updated
+  * @param {string} remove If the information about the piece putting the king under check
+  * is supposed to be removed or not
+  * @returns Void
+  */
+
+function update_check(id: string, color: string, remove: boolean): void{
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking}; 
     if(!remove){
         slot().checking_piece.piece = c_board[id].piece;
@@ -236,7 +273,13 @@ function update_check(id: string, color: string, remove: boolean){
     }
 }
 
-function check_check() {
+/** Checks if the king is under check or not
+  * is supposed to be removed or not
+  * @precondition There exist two kings on the chessboard
+  * @returns Void only assingment
+  */
+
+function check_check(): void {
     ["white", "black"].forEach(color => {    
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking}; 
     Object.keys(c_board).every(id => {
@@ -252,7 +295,6 @@ function check_check() {
             update_check(id, color, true);
             display_message("");
             return true;
-            
         }
     });
 
@@ -260,6 +302,13 @@ function check_check() {
         ? slot().under_check
         : slot().under_check});
 }
+
+/** Checks if the king can make its way out of check posion. And displays the right message. 
+ * @precondition Color is either "white" or "black" and that king is under check
+  * @param {string} color The color of the the king that is being checked
+  * is supposed to be removed or not
+  * @returns Void
+  */
 
 
 function check_move_out(color: string): void {
@@ -274,10 +323,19 @@ function check_move_out(color: string): void {
     }
 }
 
+/** Checks if there is a piece that can either take the checking piece or move into the
+ * checking lane
+ * @precondition The king is under check and color is "white" or "black"
+  * @param {string} color The color of the king being checked
+  * @example When white king is located at square 1, white queen at 25 and the threatening piece a rook at square 5
+  * it returns ["5", "4"] because these moves interupt the check
+  * @returns A key value pair with the piece that can interupt the check and with 
+  * witch moves
+  */
 
-function can_block_check(color: string) {
+function can_block_check(color: string): {[key: string]: Array<string>} {
     const slot = () => {return color === "white" ? king_tracker.Wking : king_tracker.Bking};
-    const disrupt_moves: {[key: string]: any} = {};
+    const disrupt_moves: {[key: string]: Array<string>} = {};
     Object.keys(c_board).forEach(id => {
         if (c_board[id].piece !== null && (slot().checking_piece.piece as piece).piece_color !== (c_board[id].piece as piece).piece_color 
             && ((c_board[id].piece as piece).moves.some(r => in_checking_dir(color, parseInt((slot().checking_piece.id as string))).includes(r)) 
@@ -289,12 +347,29 @@ function can_block_check(color: string) {
     return disrupt_moves;
 }
 
-// Hjälpfunktion som kollar om en pjäs rör sig inom brädet.
+
+
+/** Checks if a given square is a square on the chessboard
+ * @precondition None
+  * @param {number} target_square The number of the square being checked
+  * @example bounds_check(1000) returns false 
+  * @returns Boolean
+  */
+
 function bounds_check(target_square: number):boolean {      
     return (target_square % 10 > 0 && target_square % 10 <= 8) && (target_square < 79 && target_square > 0) 
             ? true
             : false;     
 }
+
+/** Checks if there occurs a collision between pieces and when a piece hits the edge of the board
+ * @precondition Selected_piece exist on the board, and the board is of a standard 8x8 type
+  * @param {number} target_square The number of the square being checked 
+  * @param {boolean} pawn if it is a pawn or not
+  * @param {square_type} selected_piece. The piece that is being checked
+  * @param {board_type} board The board that is being checked
+  * @returns Boolean
+  */
 
 let first_collision = true
 function check_bounds_collision(target_square: number, pawn: boolean, selected_piece: square_type, board: board_type): boolean {
@@ -329,7 +404,16 @@ function check_bounds_collision(target_square: number, pawn: boolean, selected_p
            : bounds_check(target_square) && collision_check();
 }
 
-function collosion_check_castling(color: string, direction: string) {
+/** Checks if there occurs a collision between the king and the rook in case of castling
+ * @precondition color is either "white" or "black" and direction is left or right
+  * @param {string} color The color of king being checked
+  * @param {number} direction the direction of the castling move
+  * @example If there is pieces between the rook and the king it returns false, 
+  * it returns true if there are no pieces between them.
+  * @returns Boolean
+  */
+
+function collosion_check_castling(color: string, direction: string): boolean {
     let foo = () => {return color === "white" ? 75 : 5};
     let slot = foo();
     if(direction === "left"){
@@ -354,8 +438,15 @@ function collosion_check_castling(color: string, direction: string) {
     return false;
 }
 
-// Kollar alla tillåtna värden på den valde pjäsen och sparar dessa i en array.
-export function legal_move (selected_piece: square_type, board: board_type) {
+/** Calculates the legal moves for a piece
+ * @precondition selected_piece exist on the chessboard
+  * @param {string} selected_piece Which piece legal moves should be calculated for
+  * @param {number} board What datastructure it should look in
+
+  * @returns Boolean
+  */
+ 
+ export function legal_move (selected_piece: square_type, board: board_type): Array<string> {
     function legal_move_square(selected_piece: square_type, board: board_type): Array<string> {                                                                           
         let current_square: number = parseInt(selected_piece.id);                           
         let legal_moves: Array<string> = [];
@@ -800,7 +891,7 @@ export function legal_move (selected_piece: square_type, board: board_type) {
         
     }
 
-    function move_into_check(legal_moves: Array<string>): any {     
+    function move_into_check(legal_moves: Array<string>): Array<string> {     
             let illegal_moves: Array<string> = [];
             const slot = () => {return (selected_piece.piece as piece).piece_color === "black" ? king_tracker.Bking : king_tracker.Wking}; 
 
