@@ -1,5 +1,5 @@
-import { board_type, c_board, king_tracker, starting_pos } from "./initial.config"
-import { bounds_check, can_block_check, checking_direction, check_bounds_collision, check_move_out, collosion_check_castling, intitial_game, in_checking_dir, legal_move, move_piece } from "./pieces_handler"
+import { c_board, king_tracker, piece, starting_pos } from "./initial.config"
+import { bounds_check, checking_direction, check_bounds_collision, check_move_out, collosion_check_castling, intitial_game, move_piece } from "./pieces_handler"
 import { LEFT, first_char, second_char } from "./utilites"
 
 intitial_game(starting_pos)
@@ -19,7 +19,7 @@ test("Can_block_check, in_checking_dir", () => {
     move_piece("25", "4")
     move_piece("31", "5")
     move_piece("38", "74")
-    expect(c_board["25"].piece.moves).toEqual(["36", "34", "35"])
+    expect((c_board["25"].piece as piece).moves).toEqual(["36", "34", "35"])
 })
 
 test("Bounds check", () => {
@@ -35,8 +35,8 @@ test("Test castling", () => {
     expect(collosion_check_castling("white", "right")).toBe(true)
     expect(collosion_check_castling("white", "left")).toBe(false)
     move_piece("78", "75")
-    expect(c_board["76"].piece.piece_name).toBe("Wrook")
-    expect(c_board["77"].piece.piece_name).toBe("Wking")
+    expect((c_board["76"].piece as piece).piece_name).toBe("Wrook")
+    expect((c_board["77"].piece as piece).piece_name).toBe("Wking")
     move_piece("76", "56")
     move_piece("77", "57")
 })
